@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#3f51b5">
+<title>TYN v1.0.0</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --term-fs:13px;
+  --primary:#3f51b5;--primary-dark:#303f9f;--primary-light:#7986cb;
+  --accent:#ff4081;--danger:#f44336;--success:#4ade80;--warning:#fbbf24;
+  --bg-dark:#0d0d0d;--bg-term:#0a0a0a;
+}
+html,body{height:100%}
+body{font-family:Roboto,'Helvetica Neue',Arial,sans-serif;background:#f5f5f5;color:#212121;overflow:hidden;-webkit-user-select:none;user-select:none;height:100dvh}
+.view{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:#f5f5f5}
+.view.active{display:flex}
+svg{display:block}
+
+.appbar{height:56px;background:linear-gradient(180deg,var(--primary),var(--primary-dark));color:#fff;display:flex;align-items:center;padding:0 4px;box-shadow:0 2px 4px rgba(0,0,0,.28);position:relative;z-index:10;flex-shrink:0}
+.appbar .icon-btn{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:#fff;cursor:pointer;border-radius:50%;flex-shrink:0}
+.appbar .icon-btn:active{background:rgba(255,255,255,.18)}
+.appbar h1{font-size:18px;font-weight:500;margin-left:8px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.appbar .pill{background:rgba(255,255,255,.2);padding:5px 10px;border-radius:12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;margin-right:8px;cursor:pointer}
+
+/* HOME */
+.home-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:88px;background:#f5f5f5}
+.banner{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#3f51b5,#7e57c2 55%,#ec407a);overflow:hidden;position:relative;flex-shrink:0}
+.banner img{width:100%;height:100%;object-fit:cover;display:block}
+.banner-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.55);pointer-events:none}
+.banner-overlay .logo{font-size:52px;font-weight:800;letter-spacing:.14em;line-height:1}
+.banner-overlay .tag{font-size:11px;letter-spacing:.35em;margin-top:6px;opacity:.9}
+
+.card{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);margin:10px 12px;padding:14px}
+
+.conn-card{display:flex;align-items:center;gap:12px}
+.conn-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#e0e0e0;transition:background .2s}
+.conn-icon.online{background:linear-gradient(135deg,#4ade80,#22c55e)}
+.conn-icon.offline{background:linear-gradient(135deg,#f87171,#ef4444)}
+.conn-icon.checking{background:linear-gradient(135deg,#fbbf24,#f59e0b);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.conn-icon svg{fill:#fff;width:22px;height:22px}
+.conn-info{flex:1;min-width:0}
+.conn-info .st{font-size:14px;font-weight:600;margin-bottom:2px}
+.conn-info .hint{font-size:11px;color:#757575;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conn-btn{background:var(--primary);color:#fff;border:none;border-radius:3px;padding:8px 12px;font-size:12px;font-weight:600;text-transform:uppercase;cursor:pointer;flex-shrink:0}
+.conn-btn[disabled]{opacity:.5}
+
+.coins-card{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;display:flex;align-items:center;gap:14px}
+.coins-card .coin-icon{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.coins-card .coin-icon svg{fill:#fff;width:26px;height:26px}
+.coins-card .coin-info{flex:1}
+.coins-card .coin-num{font-size:22px;font-weight:700;line-height:1}
+.coins-card .coin-label{font-size:11px;opacity:.9;margin-top:2px}
+.coins-card .add-btn{background:rgba(255,255,255,.95);color:#b45309;border:none;border-radius:3px;padding:9px 14px;font-size:12px;font-weight:700;text-transform:uppercase;cursor:pointer;flex-shrink:0}
+
+.dev-card{display:flex;align-items:center;gap:14px}
+.dev-pfp{width:56px;height:56px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#7e57c2,#ec407a);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;flex-shrink:0;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.dev-info{flex:1;min-width:0}
+.dev-info .dev-name{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px}
+.dev-info .dev-name .badge{background:linear-gradient(135deg,#3f51b5,#7e57c2);color:#fff;font-size:9px;padding:2px 6px;border-radius:8px;font-weight:600}
+.dev-info .dev-role{font-size:11px;color:#757575;margin-top:1px}
+.dev-info .dev-tiktok{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#ec407a;font-weight:600;margin-top:5px;text-decoration:none}
+.dev-info .dev-tiktok svg{width:14px;height:14px;fill:#ec407a}
+
+.section-title{padding:16px 20px 6px;font-size:13px;font-weight:600;color:#757575;text-transform:uppercase;letter-spacing:.09em;display:flex;align-items:center;justify-content:space-between}
+.section-title .count{background:#e0e0e0;color:#424242;padding:2px 8px;border-radius:10px;font-size:11px}
+
+.server-list{padding:0 4px}
+.server-card{background:#fff;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.12);margin:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer}
+.server-card:active{background:#fafafa}
+.server-card .icon-wrap{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#7e57c2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.server-card .icon-wrap svg{fill:#fff;width:22px;height:22px}
+.server-card .info{flex:1;min-width:0}
+.server-card .name{font-size:15px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.server-card .stats{font-size:11px;color:#757575;display:flex;gap:12px;flex-wrap:wrap}
+.server-card .stats span{display:inline-flex;align-items:center;gap:3px}
+.server-card .stats svg{width:12px;height:12px;fill:#9e9e9e}
+.server-card .arrow{color:#bdbdbd}
+
+.empty-state{padding:40px 24px;text-align:center;color:#9e9e9e}
+.empty-state svg{margin:0 auto 14px;fill:#e0e0e0;width:64px;height:64px}
+.empty-state h3{font-size:15px;color:#616161;margin-bottom:8px;font-weight:600}
+.empty-state p{font-size:13px;line-height:1.5;margin-bottom:16px}
+.empty-state .cta{background:linear-gradient(135deg,#3f51b5,#303f9f);color:#fff;border:none;padding:12px 24px;border-radius:4px;font-size:14px;font-weight:600;text-transform:uppercase;cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.2);display:inline-flex;align-items:center;gap:8px}
+.empty-state .cta svg{width:18px;height:18px;fill:#fff;margin:0}
+.empty-state .note{font-size:11px;color:#bdbdbd;margin-top:12px}
+
+.fab{position:absolute;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#ff4081,#f50057);border:none;box-shadow:0 4px 10px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;z-index:20}
+.fab svg{fill:#fff;width:26px;height:26px}
+
+/* TERMINAL */
+#terminal-view{background:var(--bg-term)}
+#terminal-view .appbar{background:linear-gradient(180deg,#3f51b5,#303f9f);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+#terminal-view .appbar h1{color:#f5f5f5;font-size:15px;font-weight:600;letter-spacing:.02em}
+
+.term-output{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px;font-family:'JetBrains Mono','Roboto Mono','Courier New',monospace;font-size:var(--term-fs);line-height:1.42;color:#d8d8d8;background:var(--bg-term);white-space:pre-wrap;word-break:break-all;-webkit-user-select:text;user-select:text;touch-action:pan-y;letter-spacing:.01em}
+.term-line{min-height:1.42em}
+.term-cmd{color:#7dd3fc;font-weight:500}
+.term-err{color:#f87171}
+.term-ok{color:#4ade80}
+.term-dim{color:#6b7280}
+.term-warn{color:#fbbf24}
+.term-info{color:#a78bfa}
+.term-prompt-out{color:#4ade80}
+
+.yn-bar{display:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);padding:8px 12px;flex-shrink:0;align-items:center;gap:10px;box-shadow:0 -2px 8px rgba(251,191,36,.3);position:relative;z-index:5}
+.yn-bar.show{display:flex}
+.yn-bar .question{flex:1;font-size:12px;color:#fff;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+.yn-bar .yn-btn{padding:6px 16px;font-size:13px;font-weight:700;border:none;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:.03em}
+.yn-bar .yn-yes{background:#22c55e;color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.yn-bar .yn-no{background:#ef4444;color:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.yn-bar .yn-cancel{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);padding:6px 10px;font-size:16px;line-height:1}
+
+#term-bottom-dock{position:fixed;left:0;right:0;bottom:0;z-index:25;background:#050505;border-top:1px solid #1f1f1f;transition:bottom .12s ease;padding-bottom:env(safe-area-inset-bottom,0)}
+
+.term-input-row{display:flex;align-items:center;background:#050505;padding:8px 10px;gap:8px}
+.term-prompt{color:#4ade80;font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:var(--term-fs);white-space:nowrap;font-weight:600}
+.term-input{flex:1;background:transparent;border:none;outline:none;color:#f0f0f0;font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:var(--term-fs);padding:6px 0;min-width:0;caret-color:#4ade80}
+.term-send{background:#1f1f1f;border:none;color:#e0e0e0;width:34px;height:34px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.term-send:active{background:#3f51b5}
+
+.shortcut-bar{background:#141414;border-radius:10px;margin:4px 6px 6px;padding:4px 6px;display:flex;align-items:center;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;border:1px solid #1f1f1f;min-height:42px}
+.shortcut-bar::-webkit-scrollbar{display:none}
+.sc-btn{background:transparent;color:#cfcfcf;border:none;border-radius:5px;padding:7px 10px;font-size:12.5px;font-weight:600;font-family:'JetBrains Mono','Roboto Mono',monospace;cursor:pointer;flex-shrink:0;min-width:36px;text-align:center;transition:background .1s,color .1s;line-height:1}
+.sc-btn:active{background:rgba(255,255,255,.14);color:#fff}
+.sc-btn.mod{color:#a5b4fc}
+.sc-btn.mod.active{background:#ff4081;color:#fff}
+.sc-btn.danger{color:#f87171}
+.sc-btn.danger:active{background:rgba(244,67,54,.25);color:#fff}
+.sc-btn.arrow{color:#93c5fd;font-size:14px}
+.sc-sep{width:1px;background:#2a2a2a;margin:0 4px;align-self:stretch;flex-shrink:0}
+.sc-dpad{display:grid;grid-template-columns:repeat(3,26px);grid-template-rows:repeat(2,22px);gap:1px;flex-shrink:0;margin:0 2px}
+.sc-dpad .sc-btn{padding:0;min-width:0;font-size:11px;display:flex;align-items:center;justify-content:center}
+.sc-dpad .up{grid-column:2;grid-row:1}
+.sc-dpad .left{grid-column:1;grid-row:2}
+.sc-dpad .down{grid-column:2;grid-row:2}
+.sc-dpad .right{grid-column:3;grid-row:2}
+
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;opacity:0;pointer-events:none;transition:opacity .22s}
+.sidebar-overlay.show{opacity:1;pointer-events:auto}
+.sidebar{position:fixed;top:0;bottom:0;left:0;width:284px;max-width:82vw;background:#fff;z-index:51;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:3px 0 12px rgba(0,0,0,.35)}
+.sidebar.show{transform:translateX(0)}
+.sidebar-banner{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#3f51b5,#7e57c2 55%,#ec407a);overflow:hidden;position:relative;flex-shrink:0}
+.sidebar-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.sidebar-banner .banner-overlay .logo{font-size:28px;letter-spacing:.1em}
+.sidebar-banner .banner-overlay .tag{font-size:9px;letter-spacing:.3em}
+.sidebar-items{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 0}
+.sidebar-item{display:flex;align-items:center;gap:16px;padding:12px 20px;cursor:pointer;color:#424242;font-size:14px;font-weight:500}
+.sidebar-item:active{background:#eee}
+.sidebar-item svg{width:22px;height:22px;fill:#616161;flex-shrink:0}
+.sidebar-divider{height:1px;background:#e0e0e0;margin:8px 0}
+.sidebar-header{padding:14px 20px 4px;font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#9e9e9e;font-weight:600}
+.session-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;font-size:13px;color:#424242}
+.session-item.active{background:#e8eaf6;color:#303f9f;font-weight:600}
+.session-item svg{width:18px;height:18px;fill:#757575;flex-shrink:0}
+.session-item.active svg{fill:#303f9f}
+.session-item .sname{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-footer{padding:12px 20px;border-top:1px solid #eee;font-size:11px;color:#9e9e9e;text-align:center}
+.sidebar-footer b{color:var(--primary)}
+
+#library-view{background:#fff}
+.lib-content{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;background:#fff}
+.input-group{margin-bottom:14px}
+.input-group label{display:block;font-size:12px;color:#757575;margin-bottom:6px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.input-group input,.input-group select,.input-group textarea{width:100%;padding:11px 12px;font-size:14px;border:1px solid #e0e0e0;border-radius:4px;outline:none;font-family:inherit;background:#fafafa;color:#212121}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{border-color:var(--primary);background:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border:none;border-radius:4px;cursor:pointer;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 2px 5px rgba(0,0,0,.22);font-family:inherit}
+.btn.full{width:100%}
+.btn.secondary{background:#eceff1;color:#37474f;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.btn svg{width:18px;height:18px;fill:currentColor}
+.lib-hint{font-size:12px;color:#9e9e9e;margin-bottom:12px;line-height:1.5}
+.lib-hint code{background:#f0f0f0;padding:1px 5px;border-radius:2px;color:#c2185b;font-family:'Roboto Mono',monospace}
+.lib-output{background:#0a0a0a;padding:12px;font-family:'Roboto Mono',monospace;font-size:12px;color:#e0e0e0;white-space:pre-wrap;word-break:break-all;line-height:1.55;flex:1;min-height:180px;overflow-y:auto;-webkit-user-select:text;user-select:text;border-radius:4px}
+.lib-output .dim{color:#6b7280}
+.lib-output .err{color:#f87171}
+.lib-output .ok{color:#4ade80}
+.lib-output .cmd{color:#7dd3fc}
+
+#web2app-view{background:#f5f5f5}
+.w2a-content{flex:1;overflow-y:auto;padding:12px 12px 100px}
+.form-card{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.12);margin-bottom:12px;padding:16px}
+.form-card h3{font-size:14px;font-weight:600;color:#212121;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}
+.form-card h3 svg{width:18px;height:18px;fill:var(--primary)}
+.file-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:#eceff1;color:#37474f;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;border:1px dashed #b0bec5}
+.file-btn input{display:none}
+.file-name{font-size:12px;color:#757575;margin-top:6px;font-style:italic;word-break:break-all}
+.logo-preview{width:80px;height:80px;border-radius:16px;background:#e0e0e0;margin-top:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.logo-preview img{width:100%;height:100%;object-fit:cover}
+.logo-preview svg{width:36px;height:36px;fill:#9e9e9e}
+.tabs{display:flex;gap:0;margin-bottom:12px;background:#eceff1;border-radius:4px;padding:3px}
+.tabs button{flex:1;background:transparent;border:none;padding:8px;font-size:12px;font-weight:600;color:#757575;cursor:pointer;border-radius:3px;text-transform:uppercase}
+.tabs button.active{background:#fff;color:var(--primary);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.color-row{display:flex;gap:10px;align-items:center}
+.color-row input[type=color]{width:50px;height:44px;border:1px solid #e0e0e0;border-radius:4px;padding:3px;cursor:pointer}
+.color-row input[type=text]{flex:1}
+.checkbox-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5}
+.checkbox-row:last-child{border-bottom:none}
+.checkbox-row input[type=checkbox],.checkbox-row input[type=radio]{width:20px;height:20px;accent-color:var(--primary);flex-shrink:0}
+.checkbox-row label{flex:1;font-size:13px;cursor:pointer}
+
+#releases-view{background:#f5f5f5}
+.releases-content{flex:1;overflow-y:auto;padding:12px 12px 40px}
+.release-card{background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.12);margin-bottom:12px;padding:14px;display:flex;gap:14px}
+.release-icon{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--primary),#7e57c2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.release-icon img{width:100%;height:100%;object-fit:cover}
+.release-icon svg{fill:#fff;width:26px;height:26px}
+.release-info{flex:1;min-width:0}
+.release-info .name{font-size:15px;font-weight:700;margin-bottom:2px}
+.release-info .pkg{font-size:11px;color:#757575;font-family:monospace;margin-bottom:6px}
+.release-info .meta{font-size:11px;color:#9e9e9e;display:flex;gap:10px;flex-wrap:wrap}
+.release-info .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.release-info .actions button{padding:7px 12px;font-size:11px;border-radius:3px;border:none;font-weight:600;text-transform:uppercase;cursor:pointer}
+.release-info .actions .dl{background:var(--primary);color:#fff}
+.release-info .actions .del{background:#ffebee;color:var(--danger)}
+
+#settings-view{background:#f5f5f5}
+.settings-content{flex:1;overflow-y:auto;padding:12px 12px 40px}
+.setting-item{background:#fff;border-radius:6px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.setting-item label{display:block;font-size:12px;color:#757575;font-weight:600;margin-bottom:6px;text-transform:uppercase}
+.setting-item input{width:100%;padding:10px 12px;font-size:14px;border:1px solid #e0e0e0;border-radius:4px;outline:none;font-family:inherit;background:#fafafa}
+.setting-item input:focus{border-color:var(--primary);background:#fff}
+.setting-item .hint{font-size:11px;color:#9e9e9e;margin-top:6px;line-height:1.4}
+
+/* NANO EDITOR */
+#nano-view{background:#0f0f14;color:#e5e7eb}
+#nano-view .appbar{background:linear-gradient(180deg,#7e57c2,#5e35b1)}
+.nano-info{padding:6px 12px;background:#1a1a24;border-bottom:1px solid #2a2a38;font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:11px;color:#9ca3af;display:flex;justify-content:space-between;flex-shrink:0}
+.nano-editor-wrap{flex:1;display:flex;overflow:hidden;background:#0f0f14;position:relative}
+.nano-linenums{width:42px;flex-shrink:0;background:#141420;color:#6b7280;font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:13px;line-height:1.5;padding:10px 6px 10px 0;text-align:right;overflow:hidden;user-select:none;border-right:1px solid #2a2a38;white-space:pre}
+.nano-editor{flex:1;background:#0f0f14;color:#e5e7eb;border:none;outline:none;resize:none;font-family:'JetBrains Mono','Roboto Mono','Courier New',monospace;font-size:13px;line-height:1.5;padding:10px 12px;white-space:pre;overflow:auto;tab-size:4;-webkit-user-select:text;user-select:text}
+.nano-statusbar{background:#1a1a24;padding:5px 12px;font-size:11px;color:#9ca3af;font-family:'JetBrains Mono','Roboto Mono',monospace;display:flex;justify-content:space-between;flex-shrink:0;border-top:1px solid #2a2a38}
+.nano-shortcuts{background:#050505;padding:6px 4px;display:flex;gap:4px;overflow-x:auto;flex-shrink:0;border-top:1px solid #2a2a38;scrollbar-width:none}
+.nano-shortcuts::-webkit-scrollbar{display:none}
+.nano-shortcuts button{background:#141420;color:#cbd5e1;border:1px solid #2a2a38;border-radius:4px;padding:7px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:600;cursor:pointer;flex-shrink:0;white-space:nowrap}
+.nano-shortcuts button:active{background:#3f51b5;color:#fff;border-color:#3f51b5}
+
+/* WEB RUNNER */
+#webrun-view{background:#0f0f14;color:#e5e7eb}
+#webrun-view .appbar{background:linear-gradient(180deg,#00838f,#006064)}
+.webrun-tabs{display:flex;background:#1a1a24;border-bottom:1px solid #2a2a38;flex-shrink:0}
+.webrun-tabs button{flex:1;background:transparent;border:none;color:#9ca3af;padding:11px 8px;font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;position:relative}
+.webrun-tabs button.active{color:#4dd0e1}
+.webrun-tabs button.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:#26c6da}
+.webrun-content{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.webrun-panel{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.webrun-panel.active{display:flex}
+.webrun-panel[data-panel="upload"]{padding:14px}
+.webrun-panel[data-panel="console"]{background:#050505}
+.webrun-panel[data-panel="preview"]{background:#0a0a0a}
+
+.drop-zone{border:2px dashed #37474f;border-radius:10px;padding:32px 20px;text-align:center;background:#151520;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.drop-zone:hover,.drop-zone.dragover{border-color:#26c6da;background:#0f1a1a}
+.drop-zone svg{width:56px;height:56px;fill:#4dd0e1;margin:0 auto 12px}
+.drop-zone h3{font-size:15px;color:#e5e7eb;margin-bottom:6px;font-weight:600}
+.drop-zone p{font-size:12px;color:#6b7280;line-height:1.5}
+#webrun-file-list{background:#1a1a24;border-radius:8px;padding:8px;margin-bottom:12px;max-height:200px;overflow-y:auto;font-size:12px}
+#webrun-file-list:empty{display:none}
+.wr-file{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;color:#cbd5e1;font-family:'JetBrains Mono',monospace}
+.wr-file:hover{background:#252535}
+.wr-file .wr-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-file .wr-size{color:#6b7280;font-size:11px}
+.wr-file .wr-rm{background:transparent;border:none;color:#f87171;cursor:pointer;font-size:16px;padding:0 4px;line-height:1}
+#webrun-view .btn{background:linear-gradient(135deg,#00838f,#006064)}
+
+.webrun-url-bar{display:flex;gap:6px;padding:8px 10px;background:#1a1a24;border-bottom:1px solid #2a2a38;flex-shrink:0}
+.webrun-url-bar input{flex:1;background:#0a0a0a;border:1px solid #2a2a38;color:#4dd0e1;border-radius:4px;padding:8px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;outline:none}
+.webrun-url-bar button{background:#252535;border:none;color:#4dd0e1;border-radius:4px;padding:8px 12px;cursor:pointer;font-size:14px}
+#webrun-iframe{flex:1;width:100%;border:none;background:#fff}
+
+.webrun-console{flex:1;overflow-y:auto;padding:10px 12px;font-family:'JetBrains Mono','Roboto Mono',monospace;font-size:12px;line-height:1.5;color:#d0d0d0;white-space:pre-wrap;word-break:break-all;-webkit-user-select:text;user-select:text}
+.webrun-console .log-info{color:#4dd0e1}
+.webrun-console .log-ok{color:#4ade80}
+.webrun-console .log-err{color:#f87171}
+.webrun-console .log-warn{color:#fbbf24}
+.webrun-console .log-dim{color:#6b7280}
+.webrun-status-bar{background:#1a1a24;padding:6px 12px;font-size:11px;color:#9ca3af;display:flex;justify-content:space-between;border-top:1px solid #2a2a38;flex-shrink:0}
+.webrun-status-bar .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#f87171;margin-right:6px;vertical-align:middle}
+.webrun-status-bar .dot.on{background:#4ade80;box-shadow:0 0 6px #4ade80}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.45);width:100%;max-width:380px;overflow:hidden;animation:popIn .18s ease;max-height:90vh;display:flex;flex-direction:column;color:#212121}
+@keyframes popIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-title{padding:18px 20px 4px;font-size:17px;font-weight:600;color:#212121}
+.modal-sub{padding:0 20px 10px;font-size:12px;color:#9e9e9e}
+.modal-body{padding:8px 20px 16px;overflow-y:auto;font-size:14px;color:#424242;line-height:1.5}
+.modal-actions{display:flex;justify-content:flex-end;padding:6px 12px 12px;gap:2px;border-top:1px solid #eee}
+.modal-actions button{background:transparent;border:none;padding:10px 16px;font-size:13px;font-weight:600;text-transform:uppercase;color:var(--primary);cursor:pointer;border-radius:3px;font-family:inherit}
+.modal-actions button.danger{color:var(--danger)}
+.modal-input{width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:4px;font-size:14px;outline:none;font-family:inherit;margin-top:8px}
+.modal-input:focus{border-color:var(--primary)}
+
+.config-overlay{position:fixed;inset:0;background:#f5f5f5;z-index:150;display:none;flex-direction:column;color:#212121}
+.config-overlay.show{display:flex}
+.config-appbar{height:56px;background:linear-gradient(180deg,var(--primary),var(--primary-dark));color:#fff;display:flex;align-items:center;padding:0 4px;box-shadow:0 2px 4px rgba(0,0,0,.28);flex-shrink:0}
+.config-appbar h1{font-size:18px;font-weight:500;flex:1;margin-left:8px}
+.config-tabs{display:flex;background:#fff;border-bottom:1px solid #e0e0e0;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.config-tabs::-webkit-scrollbar{display:none}
+.config-tabs button{background:transparent;border:none;padding:12px 16px;font-size:12px;font-weight:600;color:#757575;cursor:pointer;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0;position:relative}
+.config-tabs button.active{color:var(--primary)}
+.config-tabs button.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary)}
+.config-body{flex:1;overflow-y:auto;padding:16px 16px 100px;background:#f5f5f5}
+.config-panel{display:none}
+.config-panel.active{display:block}
+.config-panel .input-group input,.config-panel .input-group select,.config-panel .input-group textarea{background:#fff}
+.config-footer{position:absolute;bottom:0;left:0;right:0;background:#fff;padding:12px 16px;box-shadow:0 -2px 8px rgba(0,0,0,.1);display:flex;gap:10px;z-index:5}
+.config-footer .btn{flex:1}
+.kv-row{display:flex;gap:8px;margin-bottom:8px}
+.kv-row input{flex:1}
+.kv-row .btn{padding:0;width:40px;background:#ffebee;color:var(--danger);box-shadow:none;font-size:18px}
+.btn-add-kv{background:#e8eaf6;color:var(--primary);box-shadow:none;font-size:12px;padding:8px 14px}
+.info-banner{background:#e3f2fd;color:#1565c0;padding:10px 12px;border-radius:4px;font-size:12px;margin-bottom:12px;line-height:1.4;border-left:3px solid #1565c0}
+.warn-banner{background:#fff3e0;color:#e65100;padding:10px 12px;border-radius:4px;font-size:12px;margin-bottom:12px;line-height:1.4;border-left:3px solid #e65100}
+
+.ad-modal{max-width:400px}
+.ad-header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.ad-header span{font-size:14px;font-weight:600}
+.ad-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;font-weight:700}
+.ad-close:disabled{opacity:.4;cursor:not-allowed}
+.ad-close.ready{background:var(--danger)}
+.ad-body{padding:24px 20px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,#fafafa,#f5f5f5)}
+.ad-body .ad-icon{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.ad-body .ad-icon svg{fill:#fff;width:40px;height:40px}
+.ad-body h4{font-size:16px;font-weight:700;margin-bottom:6px}
+.ad-body p{font-size:12px;color:#757575;line-height:1.5}
+.ad-reward{margin-top:14px;font-size:14px;font-weight:700;color:var(--success);display:flex;align-items:center;gap:6px}
+.ad-reward svg{width:18px;height:18px;fill:var(--success)}
+.ad-footer{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-top:1px solid #eee}
+.ad-learn{background:transparent;border:1px solid var(--primary);color:var(--primary);padding:8px 14px;font-size:12px;font-weight:600;border-radius:3px;cursor:pointer;text-transform:uppercase}
+.ad-timer{font-size:13px;font-weight:700;color:#757575;display:flex;align-items:center;gap:6px}
+.ad-timer.ready{color:var(--success)}
+.ad-timer svg{width:16px;height:16px;fill:currentColor}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#323232;color:#fff;padding:12px 20px;border-radius:4px;font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:400;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#2e7d32}
+.toast.error{background:#c62828}
+.toast.warning{background:#ef6c00}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:3px}
+.term-output::-webkit-scrollbar-thumb,.lib-output::-webkit-scrollbar-thumb,.webrun-console::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15)}
+</style>
+</head>
+<body>
+
+<!-- ================= HOME ================= -->
+<div id="home-view" class="view active">
+  <div class="appbar">
+    <div class="icon-btn" onclick="app.openSidebar()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+    </div>
+    <h1>TYN</h1>
+    <div class="pill" onclick="app.openAddCoins()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      <span id="coin-badge">0</span>
+    </div>
+  </div>
+  <div class="home-content">
+    <div class="banner">
+      <img src="banner.jpg" alt="banner" onerror="this.style.display='none'">
+      <div class="banner-overlay">
+        <div class="logo">TYN</div>
+        <div class="tag">TERMUX BRIDGE · v1.0.0</div>
+      </div>
+    </div>
+
+    <div class="card conn-card">
+      <div class="conn-icon checking" id="conn-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <div class="conn-info">
+        <div class="st" id="conn-status-text">Checking...</div>
+        <div class="hint" id="conn-status-hint">Menghubungkan ke bridge...</div>
+      </div>
+      <button class="conn-btn" id="conn-test-btn" onclick="app.testConnection()">Test</button>
+    </div>
+
+    <div class="card coins-card">
+      <div class="coin-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+      </div>
+      <div class="coin-info">
+        <div class="coin-num" id="coin-num">0</div>
+        <div class="coin-label">TYN Coins</div>
+      </div>
+      <button class="add-btn" onclick="app.openAddCoins()">+ Add</button>
+    </div>
+
+    <div class="card dev-card">
+      <img src="pfp.jpg" class="dev-pfp" alt="YUJOU" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="dev-pfp" style="display:none">YJ</div>
+      <div class="dev-info">
+        <div class="dev-name">YUJOU <span class="badge">DEV</span></div>
+        <div class="dev-role">Developer & Maintainer</div>
+        <a href="https://tiktok.com/@bigboosme" target="_blank" class="dev-tiktok">
+          <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
+          @bigboosme
+        </a>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <span>Servers</span>
+      <span class="count" id="srv-count">0</span>
+    </div>
+    <div class="server-list" id="server-list"></div>
+  </div>
+  <button class="fab" onclick="app.openCreateServer()" title="Buat Server">
+    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+  </button>
+</div>
+
+<!-- ================= TERMINAL ================= -->
+<div id="terminal-view" class="view">
+  <div class="appbar">
+    <button class="icon-btn" onclick="app.openSidebar()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+    </button>
+    <h1 id="term-title">Session</h1>
+  </div>
+  <div class="term-output" id="term-output"></div>
+
+  <div class="yn-bar" id="yn-bar">
+    <span class="question" id="yn-question">Continue?</span>
+    <button class="yn-btn yn-yes" onclick="app.answerYN('y')">Y</button>
+    <button class="yn-btn yn-no" onclick="app.answerYN('n')">N</button>
+    <button class="yn-cancel" onclick="app.dismissYN()">✕</button>
+  </div>
+
+  <div id="term-bottom-dock">
+    <div class="term-input-row">
+      <span class="term-prompt" id="term-prompt">~ $</span>
+      <input class="term-input" id="term-input" placeholder="command..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button class="term-send" onclick="app.submitTerm()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+
+    <div class="shortcut-bar" id="shortcut-bar">
+      <button class="sc-btn mod" data-mod="ctrl" onclick="app.toggleMod('ctrl')">Ctrl</button>
+      <button class="sc-btn mod" data-mod="alt" onclick="app.toggleMod('alt')">Alt</button>
+      <button class="sc-btn" onclick="app.sendKey('\t')">Tab</button>
+      <button class="sc-btn" onclick="app.sendKey('\x1b')">Esc</button>
+      <div class="sc-sep"></div>
+      <button class="sc-btn danger" onclick="app.sendKey('\x03')" title="Ctrl+C">^C</button>
+      <button class="sc-btn danger" onclick="app.sendKey('\x04')" title="Ctrl+D">^D</button>
+      <button class="sc-btn danger" onclick="app.sendKey('\x1a')" title="Ctrl+Z">^Z</button>
+      <button class="sc-btn danger" onclick="app.sendKey('\x0c')" title="Ctrl+L">^L</button>
+      <div class="sc-sep"></div>
+      <div class="sc-dpad">
+        <button class="sc-btn arrow up" onclick="app.sendKey('\x1b[A')">↑</button>
+        <button class="sc-btn arrow left" onclick="app.sendKey('\x1b[D')">←</button>
+        <button class="sc-btn arrow down" onclick="app.sendKey('\x1b[B')">↓</button>
+        <button class="sc-btn arrow right" onclick="app.sendKey('\x1b[C')">→</button>
+      </div>
+      <div class="sc-sep"></div>
+      <button class="sc-btn" onclick="app.sendKey('\x1b[H')">Home</button>
+      <button class="sc-btn" onclick="app.sendKey('\x1b[F')">End</button>
+      <button class="sc-btn" onclick="app.sendKey('\x1b[5~')">PgUp</button>
+      <button class="sc-btn" onclick="app.sendKey('\x1b[6~')">PgDn</button>
+      <div class="sc-sep"></div>
+      <button class="sc-btn" onclick="app.appendInput('/')">/</button>
+      <button class="sc-btn" onclick="app.appendInput('|')">|</button>
+      <button class="sc-btn" onclick="app.appendInput('-')">-</button>
+      <button class="sc-btn" onclick="app.appendInput('~')">~</button>
+      <button class="sc-btn" onclick="app.appendInput('&')">&amp;</button>
+      <button class="sc-btn" onclick="app.appendInput('*')">*</button>
+      <button class="sc-btn" onclick="app.appendInput('>')">&gt;</button>
+      <button class="sc-btn" onclick="app.appendInput('"')">"</button>
+      <div class="sc-sep"></div>
+      <button class="sc-btn" onclick="app.sendKey('\n')">⏎</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= NANO EDITOR ================= -->
+<div id="nano-view" class="view">
+  <div class="appbar">
+    <button class="icon-btn" onclick="app.closeNano()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg>
+    </button>
+    <h1>nano</h1>
+    <button class="icon-btn" onclick="app.nanoSave()" title="Save">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+    </button>
+  </div>
+  <div class="nano-info">
+    <span id="nano-filename">untitled.txt</span>
+    <span id="nano-save-status">Belum disimpan</span>
+  </div>
+  <div class="nano-editor-wrap">
+    <div class="nano-linenums" id="nano-linenums">1</div>
+    <textarea class="nano-editor" id="nano-editor" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="Mulai menulis..."></textarea>
+  </div>
+  <div class="nano-statusbar">
+    <span id="nano-pos">Ln 1, Col 1</span>
+    <span id="nano-chars">0 chars</span>
+  </div>
+  <div class="nano-shortcuts">
+    <button onclick="app.nanoSave()">^S Save</button>
+    <button onclick="app.nanoSaveAs()">Save As</button>
+    <button onclick="app.nanoOpenFile()">^O Open</button>
+    <button onclick="app.nanoDownload()">⬇ Download</button>
+    <button onclick="app.nanoClear()">Clear</button>
+    <button onclick="app.closeNano()">^X Exit</button>
+  </div>
+</div>
+
+<!-- ================= WEB RUNNER ================= -->
+<div id="webrun-view" class="view">
+  <div class="appbar">
+    <button class="icon-btn" onclick="app.goHome()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg>
+    </button>
+    <h1>Web Runner</h1>
+    <button class="icon-btn" onclick="app.webrunStop()" title="Stop server">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M6 6h12v12H6z"/></svg>
+    </button>
+  </div>
+  <div class="webrun-tabs">
+    <button class="active" data-wrtab="upload">Upload</button>
+    <button data-wrtab="console">Console</button>
+    <button data-wrtab="preview">Preview</button>
+  </div>
+  <div class="webrun-content">
+    <div class="webrun-panel active" data-panel="upload">
+      <div class="drop-zone" id="webrun-drop">
+        <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+        <h3>Tap untuk upload file</h3>
+        <p>HTML, CSS, JS, PHP, PY, SH, atau ZIP<br>Semua dalam satu file juga bisa</p>
+        <input type="file" id="webrun-file-input" multiple accept="*/*" style="display:none">
+      </div>
+      <div id="webrun-file-list"></div>
+      <button class="btn full" id="webrun-start-btn" onclick="app.webrunStart()">
+        ▶ Start Server
+      </button>
+      <div style="margin-top:10px;font-size:11px;color:#6b7280;text-align:center;line-height:1.5">
+        Server berjalan di port <b style="color:#4dd0e1">8080+</b> (bukan 7700)<br>
+        Preview otomatis saat server siap
+      </div>
+    </div>
+    <div class="webrun-panel" data-panel="console">
+      <div class="webrun-console" id="webrun-console">
+        <span class="log-dim">$ Menunggu upload...</span>
+      </div>
+      <div class="webrun-status-bar">
+        <span><span class="dot" id="webrun-dot"></span><span id="webrun-status-text">idle</span></span>
+        <span id="webrun-port-label">port: —</span>
+      </div>
+    </div>
+    <div class="webrun-panel" data-panel="preview">
+      <div class="webrun-url-bar">
+        <input id="webrun-url" readonly placeholder="http://localhost:8080/">
+        <button onclick="app.webrunOpenExternal()" title="Buka di tab baru">↗</button>
+      </div>
+      <iframe id="webrun-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-downloads allow-presentation"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- ================= LIBRARY ================= -->
+<div id="library-view" class="view">
+  <div class="appbar">
+    <button class="icon-btn" onclick="app.goBack()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg>
+    </button>
+    <h1>Install Library</h1>
+  </div>
+  <div class="lib-content">
+    <div class="input-group">
+      <label>Library name</label>
+      <input id="lib-input" placeholder="e.g. python, nodejs, git" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="lib-hint">Package manager: <code>YNC</code> → backend <code>pkg</code></div>
+    <button class="btn full" onclick="app.installLibrary()">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Install
+    </button>
+    <div style="height:14px"></div>
+    <div class="lib-output" id="lib-output"><span class="dim">$ ync install &lt;library&gt;</span></div>
+  </div>
+</div>
+
+<!-- ================= WEB2APP ================= -->
+<div id="web2app-view" class="view">
+  <div class="appbar">
+    <button class="icon-btn" onclick="app.goBack()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg>
+    </button>
+    <h1>Web2App Builder</h1>
+  </div>
+  <div class="w2a-content">
+    <div class="form-card">
+      <h3><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Source</h3>
+      <div class="input-group"><label>URL Website</label><input id="w2a-url" type="url" placeholder="https://example.com"></div>
+      <div class="input-group"><label>Atau upload ZIP (root harus punya index.html)</label>
+        <label class="file-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>Pilih ZIP<input type="file" id="w2a-zip" accept=".zip" onchange="app.onZipSelected(this)"></label>
+        <div class="file-name" id="w2a-zip-name"></div>
+      </div>
+    </div>
+    <div class="form-card">
+      <h3><svg viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11z"/></svg>App Info</h3>
+      <div class="input-group"><label>App Name</label><input id="w2a-name" placeholder="My App"></div>
+      <div class="input-group"><label>Package Name</label><input id="w2a-package" placeholder="com.example.myapp"></div>
+      <div class="input-group"><label>Version</label><input id="w2a-version" placeholder="1.0.0" value="1.0.0"></div>
+    </div>
+    <div class="form-card">
+      <h3><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg>Logo</h3>
+      <label class="file-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4v6z"/></svg>Upload Logo<input type="file" id="w2a-logo" accept="image/*" onchange="app.onLogoSelected(this)"></label>
+      <div class="logo-preview" id="w2a-logo-preview"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"/></svg></div>
+    </div>
+    <div class="form-card">
+      <h3>Splash</h3>
+      <div class="tabs">
+        <button class="active" onclick="app.setSplashMode('image')">Image</button>
+        <button onclick="app.setSplashMode('video')">Video</button>
+      </div>
+      <div id="splash-image" class="tab-content active">
+        <div class="input-group"><label>Background</label><div class="color-row"><input type="color" id="w2a-splash-bg" value="#3f51b5"><input type="text" id="w2a-splash-bg-hex" value="#3f51b5"></div></div>
+        <div class="input-group"><label>Text</label><div class="color-row"><input type="color" id="w2a-splash-text" value="#ffffff"><input type="text" id="w2a-splash-text-hex" value="#ffffff"></div></div>
+        <div class="checkbox-row"><input type="checkbox" id="w2a-splash-skip" checked><label for="w2a-splash-skip">Tampilkan tombol Skip</label></div>
+      </div>
+      <div id="splash-video" class="tab-content">
+        <div class="input-group"><label>Video mp4</label><label class="file-btn">Upload Video<input type="file" id="w2a-video" accept="video/mp4" onchange="app.onVideoSelected(this)"></label><div class="file-name" id="w2a-video-name"></div></div>
+        <div class="checkbox-row"><input type="checkbox" id="w2a-splash-skip-v" checked><label for="w2a-splash-skip-v">Tampilkan tombol Skip</label></div>
+      </div>
+    </div>
+    <div class="form-card">
+      <h3>URL Handling</h3>
+      <div class="checkbox-row"><input type="radio" name="w2a-urlhandling" id="w2a-in-app" value="in_app" checked><label for="w2a-in-app">Buka di dalam aplikasi</label></div>
+      <div class="checkbox-row"><input type="radio" name="w2a-urlhandling" id="w2a-browser" value="browser"><label for="w2a-browser">Buka di browser eksternal</label></div>
+    </div>
+    <div class="form-card">
+      <h3>Features</h3>
+      <div class="checkbox-row"><input type="checkbox" id="w2a-sidebar" checked><label for="w2a-sidebar">Aktifkan Sidebar</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="w2a-slider" checked><label for="w2a-slider">Aktifkan Slider</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="w2a-fullscreen" checked><label for="w2a-fullscreen">Fullscreen</label></div>
+    </div>
+    <div class="form-card">
+      <h3>Permissions</h3>
+      <div class="checkbox-row"><input type="checkbox" id="perm-internet" checked><label for="perm-internet">INTERNET</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="perm-write"><label for="perm-write">WRITE_EXTERNAL_STORAGE</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="perm-read"><label for="perm-read">READ_EXTERNAL_STORAGE</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="perm-camera"><label for="perm-camera">CAMERA</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="perm-location"><label for="perm-location">ACCESS_FINE_LOCATION</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="perm-audio"><label for="perm-audio">RECORD_AUDIO</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="perm-notification"><label for="perm-notification">POST_NOTIFICATIONS</label></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button class="btn secondary" style="flex:1" onclick="app.previewApp()">Preview</button>
+      <button class="btn" style="flex:2" id="w2a-build-btn" onclick="app.buildApp()">Build APK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= RELEASES ================= -->
+<div id="releases-view" class="view">
+  <div class="appbar">
+    <button class="icon-btn" onclick="app.goBack()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg>
+    </button>
+    <h1>App Releases</h1>
+    <button class="icon-btn" onclick="app.loadReleases()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+  </div>
+  <div class="releases-content" id="releases-content"></div>
+</div>
+
+<!-- ================= SETTINGS ================= -->
+<div id="settings-view" class="view">
+  <div class="appbar">
+    <button class="icon-btn" onclick="app.goBack()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg>
+    </button>
+    <h1>Settings</h1>
+  </div>
+  <div class="settings-content">
+    <div class="setting-item">
+      <label>Bridge WebSocket URL</label>
+      <input id="set-ws-url" placeholder="ws://127.0.0.1:7700">
+      <div class="hint">Global default. Bisa di-override per server di config.</div>
+    </div>
+    <div class="setting-item">
+      <label>API Token</label>
+      <input id="set-api-token" placeholder="tyn_xxxxxxxxx">
+      <div class="hint">Token dari bridge.js (file .token)</div>
+    </div>
+    <div class="setting-item">
+      <label>Default Terminal Font Size</label>
+      <input id="set-term-fs" type="number" min="8" max="24" step="0.5">
+    </div>
+    <button class="btn full" onclick="app.saveSettings()">Simpan</button>
+    <div style="height:12px"></div>
+    <button class="btn secondary full" onclick="app.testConnection()">Test Connection</button>
+    <div style="height:12px"></div>
+    <button class="btn secondary full" style="background:#ffebee;color:#c62828" onclick="app.clearAllData()">Reset Semua Data</button>
+  </div>
+</div>
+
+<!-- ================= CONFIG FORM ================= -->
+<div id="config-overlay" class="config-overlay">
+  <div class="config-appbar">
+    <button class="icon-btn" onclick="app.closeCreateServer()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+    <h1>New Server</h1>
+  </div>
+  <div class="config-tabs" id="config-tabs">
+    <button class="active" onclick="app.switchConfigTab(0)">Connection</button>
+    <button onclick="app.switchConfigTab(1)">Session</button>
+    <button onclick="app.switchConfigTab(2)">Terminal</button>
+    <button onclick="app.switchConfigTab(3)">Behavior</button>
+    <button onclick="app.switchConfigTab(4)">Advanced</button>
+  </div>
+  <div class="config-body">
+    <div class="config-panel active" data-tab="0">
+      <div class="info-banner">Konfigurasi koneksi ke bridge.js</div>
+      <div class="input-group"><label>Server Name *</label><input id="cfg-name" placeholder="My Termux" autocomplete="off"></div>
+      <div class="input-group"><label>Bridge WebSocket URL *</label><input id="cfg-ws-url" placeholder="ws://127.0.0.1:7700" autocomplete="off"></div>
+      <div class="input-group"><label>API Token *</label><input id="cfg-token" placeholder="tyn_xxxxxxxxx" autocomplete="off"></div>
+      <div class="input-group"><label>Ping Interval (ms)</label><input id="cfg-ping" type="number" value="30000" min="5000"></div>
+      <div class="input-group"><label>Reconnect Delay (ms)</label><input id="cfg-reconnect" type="number" value="2000" min="500"></div>
+    </div>
+    <div class="config-panel" data-tab="1">
+      <div class="info-banner">Pengaturan sesi pertama</div>
+      <div class="input-group"><label>Session Name</label><input id="cfg-session-name" value="Session 1"></div>
+      <div class="input-group"><label>Max Sessions</label><input id="cfg-max-sessions" type="number" value="10" min="1"></div>
+      <div class="input-group"><label>Buffer Lines (scrollback)</label><input id="cfg-buffer" type="number" value="1000" min="100"></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-keepalive" checked><label for="cfg-keepalive">Keep-alive session</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-autoreconnect" checked><label for="cfg-autoreconnect">Auto reconnect saat terputus</label></div>
+    </div>
+    <div class="config-panel" data-tab="2">
+      <div class="info-banner">Konfigurasi terminal environment</div>
+      <div class="input-group"><label>Shell</label>
+        <select id="cfg-shell"><option value="bash">bash (default)</option><option value="sh">sh</option><option value="zsh">zsh</option><option value="fish">fish</option></select>
+      </div>
+      <div class="input-group"><label>Working Directory</label><input id="cfg-cwd" placeholder="~" value="~"></div>
+      <div class="input-group"><label>TERM Type</label>
+        <select id="cfg-term"><option value="xterm-256color" selected>xterm-256color</option><option value="xterm">xterm</option><option value="screen-256color">screen-256color</option><option value="vt100">vt100</option></select>
+      </div>
+      <div class="input-group"><label>Font Size (px)</label><input id="cfg-fs" type="number" value="13" min="8" max="24" step="0.5"></div>
+    </div>
+    <div class="config-panel" data-tab="3">
+      <div class="info-banner">Perilaku saat ada prompt atau event</div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-auto-yes"><label for="cfg-auto-yes">Auto-jawab "y" untuk prompt y/n</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-detect-yn" checked><label for="cfg-detect-yn">Deteksi prompt y/n otomatis</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-notify-exit" checked><label for="cfg-notify-exit">Notifikasi saat command selesai</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-confirm-danger" checked><label for="cfg-confirm-danger">Konfirmasi perintah berbahaya</label></div>
+      <div class="input-group"><label>Prompt Patterns (regex, newline)</label>
+        <textarea id="cfg-patterns" rows="3">\[y\/n\]|\(y\/n\)|\[Y\/n\]|\(Y\/N\)|continue\?|proceed\?|are you sure|\[yes\/no\]</textarea>
+      </div>
+    </div>
+    <div class="config-panel" data-tab="4">
+      <div class="warn-banner">⚠ Pengaturan ini untuk advanced user</div>
+      <div class="input-group"><label>Environment Variables</label>
+        <div id="env-kv-list"></div>
+        <button class="btn-add-kv" onclick="app.addEnvRow()">+ Tambah Env Var</button>
+      </div>
+      <div class="input-group"><label>Startup Commands</label>
+        <textarea id="cfg-startup" rows="3" placeholder="echo hello&#10;pwd"></textarea>
+      </div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-log-all"><label for="cfg-log-all">Log semua command</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-strict-mode"><label for="cfg-strict-mode">Strict mode</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfg-verbose"><label for="cfg-verbose">Verbose debugging</label></div>
+    </div>
+  </div>
+  <div class="config-footer">
+    <button class="btn secondary" onclick="app.closeCreateServer()">Cancel</button>
+    <button class="btn" onclick="app.saveServerConfig()">
+      <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      Create Server
+    </button>
+  </div>
+</div>
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="app.closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-banner">
+    <img src="banner1.jpg" alt="banner1" onerror="this.style.display='none'">
+    <div class="banner-overlay"><div class="logo">TYN</div><div class="tag">SIDEBAR</div></div>
+  </div>
+  <div class="sidebar-items">
+    <div class="sidebar-item" onclick="app.newSession()">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      <span>New Session (−5 coins)</span>
+    </div>
+    <div class="sidebar-item" onclick="app.openNano()">
+      <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      <span>Nano Editor</span>
+    </div>
+    <div class="sidebar-item" onclick="app.openWebRunner()">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+      <span>Web Runner</span>
+    </div>
+    <div class="sidebar-item" onclick="app.openLibrary()">
+      <svg viewBox="0 0 24 24"><path d="M20 6h-2.2l-1.5-1.5c-.4-.4-.9-.5-1.4-.5H9c-.5 0-1 .2-1.4.6L6.2 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+      <span>Install Library</span>
+    </div>
+    <div class="sidebar-item" onclick="app.openWeb2App()">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>
+      <span>Web2App Builder</span>
+    </div>
+    <div class="sidebar-item" onclick="app.openReleases()">
+      <svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+      <span>App Releases</span>
+    </div>
+    <div class="sidebar-item" onclick="app.openSettings()">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      <span>Settings</span>
+    </div>
+    <div class="sidebar-item" onclick="app.goHome()">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-header">Sessions</div>
+    <div id="session-list"></div>
+  </div>
+  <div class="sidebar-footer">TYN v1.0.0 · by <b>YUJOU</b></div>
+</div>
+
+<!-- ================= AD MODAL ================= -->
+<div class="modal-overlay" id="ad-overlay">
+  <div class="modal ad-modal">
+    <div class="ad-header"><span>🎬 Reward Ad</span><button class="ad-close" id="ad-close" disabled onclick="app.closeAd()">✕</button></div>
+    <div class="ad-body">
+      <div class="ad-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg></div>
+      <h4>Tonton Iklan untuk Coins</h4>
+      <p>Selesaikan iklan untuk mendapat reward TYN Coins secara gratis!</p>
+      <div class="ad-reward"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>+20 Coins</div>
+    </div>
+    <div class="ad-footer">
+      <button class="ad-learn" onclick="app.learnMore()">Pelajari lebih lanjut</button>
+      <div class="ad-timer" id="ad-timer"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg><span id="ad-timer-num">5s</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dialog-overlay">
+  <div class="modal">
+    <div class="modal-title" id="dialog-title">Konfirmasi</div>
+    <div class="modal-body">
+      <div id="dialog-message">Apakah Anda yakin?</div>
+      <input class="modal-input" id="dialog-input" style="display:none" placeholder="">
+    </div>
+    <div class="modal-actions">
+      <button id="dialog-cancel">Batal</button>
+      <button id="dialog-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   TYN v1.0.0 — Client (FIXED)
+   ============================================================ */
+
+/* ─── Placeholder resolver ──────────────────────────────────
+   Bridge injects real URL/token via serveIndex().
+   If HTML is opened outside bridge (file://, Live Server, etc.),
+   placeholders stay literal → we must fallback gracefully.
+   ─────────────────────────────────────────────────────────── */
+const _WS_RAW = '__TYN_WS_URL__';
+const _TOKEN_RAW = '__TYN_TOKEN__';
+
+function _resolveWs(){
+  // 1. Injected by bridge (real URL)
+  if (_WS_RAW && !_WS_RAW.includes('__TYN_')) return _WS_RAW;
+  // 2. Page served via http(s) → use current host (works on LAN)
+  if (location.protocol === 'http:' || location.protocol === 'https:'){
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    const host = location.hostname || 'localhost';
+    const port = location.port || '7700';
+    return `${proto}://${host}:${port}`;
+  }
+  // 3. file:// fallback
+  return 'ws://localhost:7700';
+}
+function _resolveToken(){
+  if (_TOKEN_RAW && !_TOKEN_RAW.includes('__TYN_')) return _TOKEN_RAW;
+  return '';
+}
+
+const DEFAULT_WS = _resolveWs();
+const DEFAULT_TOKEN = _resolveToken();
+
+class TYN {
+  constructor(){
+    this.ws = null;
+    this.connected = false;       // WS ke /term (untuk terminal)
+    this.httpConnected = false;   // HTTP ke /check (untuk REST API)
+    this.bridgeVersion = null;
+    this.demoMode = false;
+
+    this.wsUrl = localStorage.getItem('tyn_ws_url') || DEFAULT_WS;
+    this.apiToken = localStorage.getItem('tyn_api_token') || DEFAULT_TOKEN;
+    this.termFontSize = parseFloat(localStorage.getItem('tyn_term_fs') || '13');
+
+    this.servers = JSON.parse(localStorage.getItem('tyn_servers') || '[]');
+    this.coins = parseInt(localStorage.getItem('tyn_coins') || '50');
+    this.releases = JSON.parse(localStorage.getItem('tyn_releases') || '[]');
+    this.termHistory = {};
+    this.cmdHistory = [];
+    this.historyIdx = -1;
+
+    this.currentServerId = null;
+    this.currentSessionId = null;
+    this.configTab = 0;
+    this.modCtrl = false;
+    this.modAlt = false;
+    this.ynVisible = false;
+    this.ynTimer = null;
+
+    this._webrunFiles = [];
+    this._webrunRunId = null;
+    this._webrunPort = null;
+    this._webrunEventSource = null;
+
+    this.init();
+  }
+
+  init(){
+    document.documentElement.style.setProperty('--term-fs', this.termFontSize + 'px');
+    this.updateCoinDisplay();
+    this.renderServers();
+    this.loadSettingsToForm();
+    this.bindInputs();
+    this.setupKeyboardAwareDock();
+    this.setupNanoEditor();
+    this.setupWebRunner();
+    setTimeout(() => this.testConnection(true), 500);
+  }
+
+  bindInputs(){
+    const inp = document.getElementById('term-input');
+    inp.addEventListener('keydown', e => {
+      if (this.modCtrl && /^[a-zA-Z]$/.test(e.key)){
+        e.preventDefault();
+        const code = e.key.toUpperCase().charCodeAt(0) - 64;
+        this.sendKey(String.fromCharCode(code));
+        this.pushTerm(this.currentSessionId,
+          `<span class="term-dim">[Ctrl+${e.key.toUpperCase()}]</span>`);
+        this.toggleMod('ctrl', false);
+        return;
+      }
+      if (this.modAlt && /^[a-zA-Z0-9]$/.test(e.key)){
+        e.preventDefault();
+        this.sendKey('\x1b' + e.key);
+        this.toggleMod('alt', false);
+        return;
+      }
+      if (e.key === 'Enter'){ e.preventDefault(); this.submitTerm(); }
+      else if (e.key === 'ArrowUp'){
+        e.preventDefault();
+        if (this.cmdHistory.length){
+          this.historyIdx = Math.min(this.historyIdx + 1, this.cmdHistory.length - 1);
+          inp.value = this.cmdHistory[this.cmdHistory.length - 1 - this.historyIdx];
+        }
+      } else if (e.key === 'ArrowDown'){
+        e.preventDefault();
+        if (this.historyIdx > 0){
+          this.historyIdx--;
+          inp.value = this.cmdHistory[this.cmdHistory.length - 1 - this.historyIdx];
+        } else { this.historyIdx = -1; inp.value = ''; }
+      }
+    });
+    document.getElementById('lib-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter'){ e.preventDefault(); this.installLibrary(); }
+    });
+    ['w2a-splash-bg-hex','w2a-splash-text-hex'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => {
+        const colorId = id.replace('-hex','');
+        const c = document.getElementById(colorId);
+        if (c && /^#[0-9a-f]{6}$/i.test(el.value)) c.value = el.value;
+      });
+    });
+    ['w2a-splash-bg','w2a-splash-text'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => {
+        document.getElementById(id+'-hex').value = el.value;
+      });
+    });
+  }
+
+  setupKeyboardAwareDock(){
+    const dock = document.getElementById('term-bottom-dock');
+    const output = document.getElementById('term-output');
+    if (!dock || !output) return;
+    const update = () => {
+      if (!document.getElementById('terminal-view').classList.contains('active')) return;
+      const vv = window.visualViewport;
+      let kb = 0;
+      if (vv) kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      dock.style.bottom = kb + 'px';
+      output.style.paddingBottom = (dock.offsetHeight + kb + 24) + 'px';
+      output.scrollTop = output.scrollHeight;
+    };
+    this._updateDock = update;
+    if (window.visualViewport){
+      window.visualViewport.addEventListener('resize', update);
+      window.visualViewport.addEventListener('scroll', update);
+    }
+    window.addEventListener('resize', update);
+    setTimeout(update, 100);
+  }
+
+  toggleMod(name, force){
+    if (name === 'ctrl') this.modCtrl = (typeof force === 'boolean') ? force : !this.modCtrl;
+    if (name === 'alt') this.modAlt = (typeof force === 'boolean') ? force : !this.modAlt;
+    document.querySelectorAll('.sc-btn.mod').forEach(b => {
+      const m = b.getAttribute('data-mod');
+      b.classList.toggle('active', (m === 'ctrl' && this.modCtrl) || (m === 'alt' && this.modAlt));
+    });
+  }
+
+  sendKey(seq){
+    if (!this.currentSessionId){ this.toast('Belum ada session', 'warning'); return; }
+    if (this.connected && this.ws && this.ws.readyState === 1){
+      this.ws.send(JSON.stringify({ type: 'input', data: seq }));
+    } else if (this.demoMode){
+      if (seq === '\x03') this.pushTerm(this.currentSessionId, '<span class="term-warn">^C</span>');
+      else if (seq === '\x04') this.pushTerm(this.currentSessionId, '<span class="term-dim">^D</span>');
+      else if (seq === '\x1b[A') this.pushTerm(this.currentSessionId, '<span class="term-dim">↑ history</span>');
+      else if (seq === '\x1b[B') this.pushTerm(this.currentSessionId, '<span class="term-dim">↓ history</span>');
+      else this.pushTerm(this.currentSessionId, '<span class="term-dim">' + this.esc(JSON.stringify(seq)) + '</span>');
+    }
+  }
+  appendInput(ch){
+    const inp = document.getElementById('term-input');
+    inp.value += ch;
+    inp.focus();
+  }
+
+  showYN(question){
+    const chk = document.getElementById('cfg-detect-yn');
+    if (chk && !chk.checked) return;
+    document.getElementById('yn-question').textContent = question || 'Continue?';
+    document.getElementById('yn-bar').classList.add('show');
+    this.ynVisible = true;
+    clearTimeout(this.ynTimer);
+    this.ynTimer = setTimeout(() => this.dismissYN(), 60000);
+    if (this._updateDock) this._updateDock();
+  }
+  dismissYN(){
+    document.getElementById('yn-bar').classList.remove('show');
+    this.ynVisible = false;
+    clearTimeout(this.ynTimer);
+    if (this._updateDock) this._updateDock();
+  }
+  answerYN(ans){
+    this.sendKey(ans + '\n');
+    this.pushTerm(this.currentSessionId, `<span class="term-cmd">${ans}</span>`);
+    this.dismissYN();
+  }
+
+  dialog({title, message, okText='OK', cancelText='Batal', danger=false, input=null, placeholder=''}){
+    return new Promise(resolve => {
+      const overlay = document.getElementById('dialog-overlay');
+      document.getElementById('dialog-title').textContent = title || 'Konfirmasi';
+      document.getElementById('dialog-message').textContent = message || '';
+      const okBtn = document.getElementById('dialog-ok');
+      const cancelBtn = document.getElementById('dialog-cancel');
+      const inputEl = document.getElementById('dialog-input');
+      okBtn.textContent = okText;
+      okBtn.className = danger ? 'danger' : '';
+      cancelBtn.textContent = cancelText;
+      cancelBtn.style.display = cancelText ? '' : 'none';
+      if (input){
+        inputEl.style.display = 'block';
+        inputEl.value = input.defaultValue || '';
+        inputEl.placeholder = placeholder || '';
+        setTimeout(() => inputEl.focus(), 50);
+      } else {
+        inputEl.style.display = 'none';
+      }
+      overlay.classList.add('show');
+      const done = (result) => {
+        overlay.classList.remove('show');
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+        inputEl.onkeydown = null;
+        resolve(result);
+      };
+      okBtn.onclick = () => done(input ? (inputEl.value || null) : true);
+      cancelBtn.onclick = () => done(false);
+      inputEl.onkeydown = (e) => { if (e.key === 'Enter'){ e.preventDefault(); okBtn.click(); } };
+    });
+  }
+  confirm(title, message, opts={}){
+    return this.dialog({ title, message, okText: opts.okText || 'OK', cancelText: opts.cancelText || 'Batal', danger: opts.danger });
+  }
+  prompt(title, message, defaultValue='', placeholder=''){
+    return this.dialog({ title, message, input: { defaultValue }, placeholder, okText: 'OK', cancelText: 'Batal' });
+  }
+
+  toast(msg, type=''){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    clearTimeout(this._toastT);
+    this._toastT = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  showView(name){
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    if (name === 'terminal-view' && this._updateDock) setTimeout(this._updateDock, 50);
+  }
+  goBack(){ this.showView('terminal-view'); this.renderTerminal(); }
+  goHome(){ this.closeSidebar(); this.showView('home-view'); this.renderServers(); }
+
+  /* ---------- REST URL helper ---------- */
+  getHttpBase(){
+    const base = (this.wsUrl || DEFAULT_WS).replace(/\/term.*$/, '').replace(/\/$/, '');
+    return base.replace('ws://','http://').replace('wss://','https://');
+  }
+  getHttpBaseFromWs(wsUrl){
+    const base = (wsUrl || DEFAULT_WS).replace(/\/term.*$/, '').replace(/\/$/, '');
+    return base.replace('ws://','http://').replace('wss://','https://');
+  }
+
+  /* ---------- SETTINGS ---------- */
+  loadSettingsToForm(){
+    document.getElementById('set-ws-url').value = this.wsUrl;
+    document.getElementById('set-api-token').value = this.apiToken;
+    document.getElementById('set-term-fs').value = this.termFontSize;
+  }
+  saveSettings(){
+    this.wsUrl = document.getElementById('set-ws-url').value.trim();
+    this.apiToken = document.getElementById('set-api-token').value.trim();
+    this.termFontSize = parseFloat(document.getElementById('set-term-fs').value) || 13;
+    localStorage.setItem('tyn_ws_url', this.wsUrl);
+    localStorage.setItem('tyn_api_token', this.apiToken);
+    localStorage.setItem('tyn_term_fs', this.termFontSize);
+    document.documentElement.style.setProperty('--term-fs', this.termFontSize + 'px');
+    this.toast('Settings disimpan', 'success');
+    if (this.ws) { try { this.ws.close(); } catch(_){}; this.ws = null; this.connected = false; }
+    this.httpConnected = false;
+    this.testConnection();
+  }
+  async clearAllData(){
+    const ok = await this.confirm('Reset Semua Data', 'Semua data (server, session, settings, coins) akan dihapus. Lanjutkan?', { danger: true, okText: 'Hapus' });
+    if (!ok) return;
+    localStorage.clear();
+    location.reload();
+  }
+
+  /* ---------- COINS ---------- */
+  updateCoinDisplay(){
+    document.getElementById('coin-num').textContent = this.coins;
+    document.getElementById('coin-badge').textContent = this.coins;
+    localStorage.setItem('tyn_coins', this.coins);
+  }
+  addCoins(n){ this.coins += n; this.updateCoinDisplay(); }
+  spendCoins(n){
+    if (this.coins < n){ this.toast('Coins tidak cukup!', 'error'); return false; }
+    this.coins -= n; this.updateCoinDisplay(); return true;
+  }
+  openAddCoins(){
+    this.adReady = false;
+    document.getElementById('ad-overlay').classList.add('show');
+    document.getElementById('ad-close').disabled = true;
+    document.getElementById('ad-close').classList.remove('ready');
+    document.getElementById('ad-timer').classList.remove('ready');
+    let n = 5;
+    document.getElementById('ad-timer-num').textContent = n + 's';
+    clearInterval(this.adTimer);
+    this.adTimer = setInterval(() => {
+      n--;
+      if (n <= 0){
+        clearInterval(this.adTimer);
+        document.getElementById('ad-timer-num').textContent = '✓';
+        document.getElementById('ad-timer').classList.add('ready');
+        const btn = document.getElementById('ad-close');
+        btn.disabled = false; btn.classList.add('ready');
+        this.adReady = true;
+      } else {
+        document.getElementById('ad-timer-num').textContent = n + 's';
+      }
+    }, 1000);
+  }
+  closeAd(){
+    if (!this.adReady) return;
+    clearInterval(this.adTimer);
+    document.getElementById('ad-overlay').classList.remove('show');
+    this.addCoins(20);
+    this.toast('+20 coins! 🎉', 'success');
+  }
+  learnMore(){ window.open('https://tiktok.com/@bigboosme', '_blank'); }
+
+  /* ============================================================
+     CONNECTION — FIXED: set httpConnected flag + timeout
+     ============================================================ */
+  async testConnection(silent){
+    const icon = document.getElementById('conn-icon');
+    const st = document.getElementById('conn-status-text');
+    const hint = document.getElementById('conn-status-hint');
+    const btn = document.getElementById('conn-test-btn');
+    if (!silent){
+      icon.className = 'conn-icon checking';
+      st.textContent = 'Checking...'; hint.textContent = 'Menghubungkan...';
+      btn.disabled = true;
+    }
+
+    const baseUrl = this.getHttpBase();
+    let success = false, data = null, errMsg = '';
+    try {
+      const url = baseUrl + '/check?token=' + encodeURIComponent(this.apiToken);
+      const opts = { headers: { 'X-API-Token': this.apiToken } };
+      if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+        opts.signal = AbortSignal.timeout(6000);
+      }
+      const resp = await fetch(url, opts);
+      if (resp.ok){
+        data = await resp.json();
+        success = true;
+      } else {
+        errMsg = 'HTTP ' + resp.status + (resp.status === 401 ? ' (token salah)' : '');
+      }
+    } catch(e){
+      errMsg = e.message || 'network error';
+    }
+
+    // 🔑 PENTING — update flag httpConnected untuk REST API calls
+    this.httpConnected = success;
+    this.bridgeVersion = success ? (data.version || '?') : null;
+
+    if (success){
+      icon.className = 'conn-icon online';
+      st.textContent = 'Terhubung';
+      hint.textContent = `Bridge v${data.version} · ${data.execMode} · Flutter ${data.flutterInstalled ? '✓' : '✗'}`;
+    } else {
+      icon.className = 'conn-icon offline';
+      st.textContent = 'Tidak terhubung';
+      hint.textContent = 'Bridge offline · ' + (errMsg || 'unknown');
+    }
+    btn.disabled = false;
+    if (!silent) {
+      this.toast(success ? 'Bridge terhubung ✓' : 'Bridge offline: ' + errMsg,
+        success ? 'success' : 'error');
+    }
+  }
+
+  /* ---------- HOME ---------- */
+  renderServers(){
+    const list = document.getElementById('server-list');
+    const count = this.servers.length;
+    document.getElementById('srv-count').textContent = count;
+
+    if (!count){
+      list.innerHTML = `<div class="empty-state">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        <h3>Belum ada server</h3>
+        <p>Buat server dulu untuk mengakses terminal. Setiap server butuh konfigurasi lengkap.</p>
+        <button class="cta" onclick="app.openCreateServer()">
+          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Buat Server Baru
+        </button>
+        <div class="note">−10 coins · terminal terkunci sampai server dibuat</div>
+      </div>`;
+      return;
+    }
+    list.innerHTML = '';
+    this.servers.forEach(srv => {
+      const card = document.createElement('div');
+      card.className = 'server-card';
+      card.onclick = () => this.openServer(srv.id);
+      card.innerHTML = `
+        <div class="icon-wrap"><svg viewBox="0 0 24 24"><path d="M20 13H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zM7 19c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM20 3H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1zM7 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
+        <div class="info">
+          <div class="name">${this.esc(srv.name)}</div>
+          <div class="stats">
+            <span><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>${srv.sessions.length} sessions</span>
+            <span><svg viewBox="0 0 24 24"><path d="M20 6h-2.2l-1.5-1.5c-.4-.4-.9-.5-1.4-.5H9c-.5 0-1 .2-1.4.6L6.2 6H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>${srv.libraries.length} libs</span>
+            <span>${(srv.config?.terminal?.shell || 'bash')}</span>
+          </div>
+        </div>
+        <div class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></div>`;
+      list.appendChild(card);
+    });
+  }
+
+  openCreateServer(){
+    if (this.coins < 10){
+      this.toast('Butuh 10 coins untuk buat server', 'warning');
+      this.openAddCoins();
+      return;
+    }
+    document.getElementById('cfg-name').value = '';
+    document.getElementById('cfg-ws-url').value = this.wsUrl || DEFAULT_WS;
+    document.getElementById('cfg-token').value = this.apiToken || '';
+    document.getElementById('cfg-session-name').value = 'Session 1';
+    document.getElementById('cfg-cwd').value = '~';
+    document.getElementById('cfg-startup').value = '';
+    document.getElementById('env-kv-list').innerHTML = '';
+    this.addEnvRow('', '');
+    this.switchConfigTab(0);
+    document.getElementById('config-overlay').classList.add('show');
+  }
+  closeCreateServer(){
+    document.getElementById('config-overlay').classList.remove('show');
+  }
+  switchConfigTab(idx){
+    this.configTab = idx;
+    document.querySelectorAll('#config-tabs button').forEach((b,i) => b.classList.toggle('active', i === idx));
+    document.querySelectorAll('.config-panel').forEach(p => p.classList.toggle('active', parseInt(p.getAttribute('data-tab')) === idx));
+  }
+  addEnvRow(k='', v=''){
+    const list = document.getElementById('env-kv-list');
+    const row = document.createElement('div');
+    row.className = 'kv-row';
+    row.innerHTML = `<input placeholder="KEY" value="${this.esc(k)}"><input placeholder="value" value="${this.esc(v)}"><button class="btn" onclick="this.parentElement.remove()">✕</button>`;
+    list.appendChild(row);
+  }
+
+  collectServerConfig(){
+    const env = {};
+    document.querySelectorAll('#env-kv-list .kv-row').forEach(r => {
+      const ins = r.querySelectorAll('input');
+      const k = ins[0].value.trim();
+      const v = ins[1].value;
+      if (k) env[k] = v;
+    });
+    return {
+      name: document.getElementById('cfg-name').value.trim(),
+      connection: {
+        url: document.getElementById('cfg-ws-url').value.trim(),
+        token: document.getElementById('cfg-token').value.trim(),
+        pingInterval: parseInt(document.getElementById('cfg-ping').value) || 30000,
+        reconnectDelay: parseInt(document.getElementById('cfg-reconnect').value) || 2000
+      },
+      session: {
+        firstName: document.getElementById('cfg-session-name').value.trim() || 'Session 1',
+        maxSessions: parseInt(document.getElementById('cfg-max-sessions').value) || 10,
+        bufferLines: parseInt(document.getElementById('cfg-buffer').value) || 1000,
+        keepAlive: document.getElementById('cfg-keepalive').checked,
+        autoReconnect: document.getElementById('cfg-autoreconnect').checked
+      },
+      terminal: {
+        shell: document.getElementById('cfg-shell').value,
+        cwd: document.getElementById('cfg-cwd').value.trim() || '~',
+        term: document.getElementById('cfg-term').value,
+        fontSize: parseFloat(document.getElementById('cfg-fs').value) || 13
+      },
+      behavior: {
+        autoYes: document.getElementById('cfg-auto-yes').checked,
+        detectYN: document.getElementById('cfg-detect-yn').checked,
+        notifyOnExit: document.getElementById('cfg-notify-exit').checked,
+        confirmDanger: document.getElementById('cfg-confirm-danger').checked,
+        promptPatterns: document.getElementById('cfg-patterns').value.split('\n').map(s => s.trim()).filter(Boolean)
+      },
+      advanced: {
+        env,
+        startup: document.getElementById('cfg-startup').value.split('\n').map(s => s.trim()).filter(Boolean),
+        logAll: document.getElementById('cfg-log-all').checked,
+        strictMode: document.getElementById('cfg-strict-mode').checked,
+        verbose: document.getElementById('cfg-verbose').checked
+      }
+    };
+  }
+
+  saveServerConfig(){
+    const cfg = this.collectServerConfig();
+    if (!cfg.name){ this.toast('Nama server wajib', 'error'); this.switchConfigTab(0); document.getElementById('cfg-name').focus(); return; }
+    if (!cfg.connection.url){ this.toast('URL bridge wajib', 'error'); this.switchConfigTab(0); document.getElementById('cfg-ws-url').focus(); return; }
+    if (!cfg.connection.token){ this.toast('API token wajib', 'error'); this.switchConfigTab(0); document.getElementById('cfg-token').focus(); return; }
+    if (!/^wss?:\/\//.test(cfg.connection.url)){ this.toast('URL harus ws:// atau wss://', 'error'); this.switchConfigTab(0); return; }
+    if (!this.spendCoins(10)){ this.closeCreateServer(); return; }
+
+    const srv = {
+      id: 'srv_' + Date.now(),
+      name: cfg.name,
+      createdAt: Date.now(),
+      config: cfg,
+      sessions: [{ id: 'ses_' + Date.now(), name: cfg.session.firstName, createdAt: Date.now() }],
+      libraries: []
+    };
+    this.servers.push(srv);
+    this.save();
+    this.renderServers();
+    this.closeCreateServer();
+    this.toast('Server dibuat!', 'success');
+    this.openServer(srv.id, srv.sessions[0].id);
+  }
+
+  openServer(serverId, sessionId){
+    const srv = this.getServer(serverId);
+    if (!srv){ this.toast('Server tidak ditemukan', 'error'); return; }
+    if (!srv.sessions.length){ this.toast('Server tidak punya session', 'error'); return; }
+    this.currentServerId = serverId;
+    if (srv.config){
+      const c = srv.config;
+      if (c.connection?.url) this.wsUrl = c.connection.url;
+      if (c.connection?.token) this.apiToken = c.connection.token;
+      if (c.terminal?.fontSize) this.setFontSize(c.terminal.fontSize);
+      this._serverConfig = c;
+    }
+    this.currentSessionId = sessionId || srv.sessions[0].id;
+    this.updateSessionList();
+    this.showView('terminal-view');
+    this.renderTerminal();
+    this.connect();
+    setTimeout(() => document.getElementById('term-input').focus(), 100);
+  }
+
+  openSidebar(){
+    if (!this.currentServerId){
+      this.updateSessionList();
+    }
+    document.getElementById('sidebar').classList.add('show');
+    document.getElementById('sidebar-overlay').classList.add('show');
+  }
+  closeSidebar(){
+    document.getElementById('sidebar').classList.remove('show');
+    document.getElementById('sidebar-overlay').classList.remove('show');
+  }
+  updateSessionList(){
+    const srv = this.getServer(this.currentServerId);
+    const list = document.getElementById('session-list');
+    if (!srv){ list.innerHTML = '<div style="padding:10px 20px;color:#9e9e9e;font-size:12px">Belum ada session</div>'; return; }
+    list.innerHTML = '';
+    srv.sessions.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'session-item' + (s.id === this.currentSessionId ? ' active' : '');
+      el.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg><span class="sname">${this.esc(s.name)}</span>`;
+      el.onclick = () => this.switchSession(s.id);
+      list.appendChild(el);
+    });
+  }
+  switchSession(id){
+    this.currentSessionId = id;
+    this.updateSessionList(); this.renderTerminal(); this.closeSidebar();
+    const srv = this.getServer(this.currentServerId);
+    const s = srv.sessions.find(x => x.id === id);
+    document.getElementById('term-title').textContent = s ? s.name : 'Session';
+  }
+  newSession(){
+    if (this.coins < 5){ this.toast('Butuh 5 coins', 'warning'); this.openAddCoins(); return; }
+    const srv = this.getServer(this.currentServerId);
+    if (!srv){ this.toast('Buka server dulu', 'error'); return; }
+    if (!this.spendCoins(5)) return;
+    const name = 'Session ' + (srv.sessions.length + 1);
+    const sess = { id: 'ses_' + Date.now(), name, createdAt: Date.now() };
+    srv.sessions.push(sess);
+    this.save();
+    this.currentSessionId = sess.id;
+    this.updateSessionList(); this.renderTerminal(); this.closeSidebar();
+    this.pushTerm(this.currentSessionId, `<span class="term-ok">* new session "${this.esc(name)}"</span>`);
+    document.getElementById('term-title').textContent = name;
+    this.toast('Session dibuat', 'success');
+  }
+
+  connect(){
+    if (this.ws && this.connected) return;
+    try {
+      const baseUrl = (this.wsUrl || DEFAULT_WS).replace(/\/term.*$/, '').replace(/\/$/, '');
+      const url = `${baseUrl}/term?token=${encodeURIComponent(this.apiToken)}&session=${encodeURIComponent(this.currentSessionId || '')}`;
+      this.ws = new WebSocket(url);
+      const self = this;
+      const timeout = setTimeout(() => { if (!self.connected) self.enableDemo(); }, 3000);
+      this.ws.onopen = () => {
+        clearTimeout(timeout);
+        self.connected = true; self.demoMode = false;
+        self.pushTerm(self.currentSessionId, '<span class="term-ok">* connected to bridge</span>');
+        const startup = self._serverConfig?.advanced?.startup;
+        if (Array.isArray(startup) && startup.length){
+          startup.forEach(cmd => self.sendRaw(cmd));
+        }
+      };
+      this.ws.onmessage = ev => {
+        let txt = ev.data, msg = null;
+        try { msg = JSON.parse(ev.data); } catch(_){}
+        if (msg){
+          if (msg.type === 'out') txt = msg.data;
+          else if (msg.type === 'exit'){
+            self.pushTerm(self.currentSessionId, '<span class="term-dim">* exit</span>');
+            return;
+          } else if (msg.type === 'error'){
+            self.pushTerm(self.currentSessionId, `<span class="term-err">${self.esc(msg.data)}</span>`);
+            return;
+          } else if (msg.type === 'yn-prompt' || msg.type === 'prompt'){
+            self.showYN(msg.question || msg.data || 'Continue?');
+            return;
+          }
+        }
+        self.appendRaw(txt);
+        self.maybeDetectYN(txt);
+      };
+      this.ws.onerror = () => { clearTimeout(timeout); self.enableDemo(); };
+      this.ws.onclose = () => {
+        if (self.connected){
+          self.connected = false;
+          self.pushTerm(self.currentSessionId, '<span class="term-warn">* connection closed</span>');
+        } else if (!self.demoMode) self.enableDemo();
+      };
+    } catch(e){ this.enableDemo(); }
+  }
+
+  maybeDetectYN(text){
+    const cfg = this._serverConfig?.behavior;
+    if (cfg && cfg.detectYN === false) return;
+    const patterns = (cfg && cfg.promptPatterns && cfg.promptPatterns.length)
+      ? cfg.promptPatterns.join('|')
+      : '(\\[y\\/n\\]|\\(y\\/n\\)|\\[Y\\/n\\]|\\(Y\\/N\\)|continue\\?|proceed\\?|are you sure|\\[yes\\/no\\])';
+    try {
+      const re = new RegExp(patterns, 'i');
+      if (re.test(text)){
+        const q = text.trim().slice(-100);
+        this.showYN(q);
+        if (cfg && cfg.autoYes) setTimeout(() => this.answerYN('y'), 300);
+      }
+    } catch(_){}
+  }
+
+  enableDemo(){
+    this.demoMode = true; this.connected = false;
+    this.pushTerm(this.currentSessionId, '<span class="term-warn">* bridge offline — DEMO mode</span>');
+  }
+
+  mapCommand(cmd){ return cmd.replace(/(^|\s)ync(?=\s|$)/g, '$1pkg'); }
+  sendRaw(cmd){
+    const mapped = this.mapCommand(cmd);
+    if (this.connected && this.ws && this.ws.readyState === 1){
+      this.ws.send(JSON.stringify({ type: 'exec', cmd: mapped }));
+    } else { this.demoExec(mapped); }
+  }
+
+  renderTerminal(){
+    const out = document.getElementById('term-output');
+    const hist = this.termHistory[this.currentSessionId] || [];
+    out.innerHTML = hist.join('');
+    out.scrollTop = out.scrollHeight;
+    const srv = this.getServer(this.currentServerId);
+    const s = srv && srv.sessions.find(x => x.id === this.currentSessionId);
+    document.getElementById('term-title').textContent = s ? s.name : 'Session';
+    if (this._updateDock) this._updateDock();
+  }
+  pushTerm(sessionId, html){
+    if (!sessionId) return;
+    if (!this.termHistory[sessionId]) this.termHistory[sessionId] = [];
+    this.termHistory[sessionId].push(html);
+    if (sessionId === this.currentSessionId){
+      const out = document.getElementById('term-output');
+      const d = document.createElement('div');
+      d.className = 'term-line';
+      d.innerHTML = html;
+      out.appendChild(d);
+      out.scrollTop = out.scrollHeight;
+    }
+  }
+  appendRaw(text){
+    const safe = this.esc(text);
+    let html = safe;
+    if (/error|not found|denied|failed/i.test(text)) html = `<span class="term-err">${safe}</span>`;
+    this.pushTerm(this.currentSessionId, html);
+  }
+  submitTerm(){
+    const inp = document.getElementById('term-input');
+    const cmd = inp.value;
+    if (!cmd.trim()) return;
+    this.cmdHistory.push(cmd);
+    this.historyIdx = -1;
+    this.pushTerm(this.currentSessionId, `<span class="term-prompt-out">~ $</span> <span class="term-cmd">${this.esc(cmd)}</span>`);
+    inp.value = '';
+    this.sendRaw(cmd);
+  }
+  setFontSize(px){
+    px = Math.max(8, Math.min(24, Math.round(px * 2) / 2));
+    this.termFontSize = px;
+    document.documentElement.style.setProperty('--term-fs', px + 'px');
+    localStorage.setItem('tyn_term_fs', px);
+  }
+
+  demoExec(cmd){
+    const self = this;
+    const trimmed = cmd.trim();
+    const parts = trimmed.split(/\s+/);
+    const base = parts[0];
+    const stream = (text) => {
+      text.split('\n').filter((l,i,a) => i < a.length-1 || l !== '').forEach((ln,i) =>
+        setTimeout(() => self.pushTerm(self.currentSessionId, '<span class="term-dim">' + self.esc(ln) + '</span>'), i*60));
+    };
+    if (trimmed === 'clear'){ this.termHistory[this.currentSessionId] = []; document.getElementById('term-output').innerHTML = ''; return; }
+    if (trimmed === 'help'){ stream('TYN demo shell\nCommands: pkg install <name>, ls, echo, whoami, clear, help, yes-test\nKetik "yes-test" untuk test y/n prompt'); }
+    else if (trimmed === 'yes-test'){ stream('Do you want to continue? [y/n]'); setTimeout(() => this.showYN('Do you want to continue? [y/n]'), 500); }
+    else if (base === 'pkg' && parts[1] === 'install'){ const lib = parts.slice(2).join(' ') || 'pkg'; stream(`Reading...\nThe following NEW packages will be installed:\n  ${lib}\nUnpacking...\nSetting up...\nDone.`); this.trackLibrary(lib); }
+    else if (base === 'ls'){ stream('bin  boot  data  dev  etc  home  lib  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var'); }
+    else if (base === 'echo'){ stream(parts.slice(1).join(' ')); }
+    else if (base === 'whoami'){ stream('u0_a123'); }
+    else { stream(`bash: ${base}: command not found`); }
+  }
+  trackLibrary(name){
+    const srv = this.getServer(this.currentServerId);
+    if (!srv) return;
+    if (!srv.libraries.includes(name)) srv.libraries.push(name);
+    this.save();
+  }
+
+  openLibrary(){
+    if (!this.currentServerId){ this.toast('Buat server dulu', 'warning'); return; }
+    this.closeSidebar(); this.showView('library-view');
+    document.getElementById('lib-output').innerHTML = '<span class="dim">$ ync install &lt;library&gt;</span>';
+    setTimeout(() => document.getElementById('lib-input').focus(), 100);
+  }
+  installLibrary(){
+    const inp = document.getElementById('lib-input');
+    const name = inp.value.trim();
+    if (!name){ inp.focus(); return; }
+    const out = document.getElementById('lib-output');
+    const installCmd = 'pkg install ' + name;
+    out.innerHTML += `\n<span class="cmd">$ ync install ${this.esc(name)}</span>`;
+    out.innerHTML += `\n<span class="dim">[mapped] ${this.esc(installCmd)}</span>`;
+    inp.value = '';
+    const self = this;
+    const append = (html) => { out.innerHTML += html; out.scrollTop = out.scrollHeight; };
+    if (this.connected && this.ws && this.ws.readyState === 1){
+      this.ws.send(JSON.stringify({ type: 'exec', cmd: installCmd }));
+      const orig = this.ws.onmessage;
+      this.ws.onmessage = ev => {
+        let txt = ev.data;
+        try { const j = JSON.parse(ev.data); if (j.type === 'out') txt = j.data; } catch(_){}
+        append('\n<span class="dim">' + this.esc(txt) + '</span>');
+        orig(ev);
+      };
+      setTimeout(() => { this.ws.onmessage = orig; }, 20000);
+      this.trackLibrary(name);
+    } else {
+      const lines = ['Reading package lists...',`The following NEW packages will be installed:\n  ${name}`,'Unpacking...','Setting up...','[OK] installation complete.'];
+      lines.forEach((ln,i) => setTimeout(() => append('\n<span class="' + (i === lines.length-1 ? 'ok' : 'dim') + '">' + self.esc(ln) + '</span>'), i*90));
+      this.trackLibrary(name);
+    }
+  }
+
+  /* ---------- NANO ---------- */
+  setupNanoEditor(){
+    const ed = document.getElementById('nano-editor');
+    if (!ed) return;
+    const update = () => this.nanoUpdateNumbers();
+    ed.addEventListener('input', update);
+    ed.addEventListener('scroll', () => {
+      document.getElementById('nano-linenums').scrollTop = ed.scrollTop;
+    });
+    ed.addEventListener('click', update);
+    ed.addEventListener('keyup', update);
+    ed.addEventListener('keydown', e => {
+      if (e.key === 'Tab'){
+        e.preventDefault();
+        const start = ed.selectionStart, end = ed.selectionEnd;
+        ed.value = ed.value.substring(0, start) + '    ' + ed.value.substring(end);
+        ed.selectionStart = ed.selectionEnd = start + 4;
+        update();
+      }
+    });
+  }
+  openNano(filename){
+    this.closeSidebar();
+    this.showView('nano-view');
+    const ed = document.getElementById('nano-editor');
+    const stored = localStorage.getItem('tyn_nano_buffer');
+    if (stored && !ed.value) ed.value = stored;
+    if (filename) document.getElementById('nano-filename').textContent = filename;
+    this.nanoUpdateNumbers();
+    setTimeout(() => ed.focus(), 100);
+  }
+  closeNano(){
+    localStorage.setItem('tyn_nano_buffer', document.getElementById('nano-editor').value);
+    this.showView('terminal-view');
+    this.renderTerminal();
+  }
+  nanoUpdateNumbers(){
+    const ed = document.getElementById('nano-editor');
+    const ln = document.getElementById('nano-linenums');
+    if (!ed || !ln) return;
+    const count = ed.value.split('\n').length || 1;
+    let nums = '';
+    for (let i = 1; i <= count; i++) nums += i + '\n';
+    ln.textContent = nums;
+    const pos = ed.selectionStart;
+    const before = ed.value.slice(0, pos);
+    const lines = before.split('\n');
+    const line = lines.length;
+    const col = lines[lines.length-1].length + 1;
+    document.getElementById('nano-pos').textContent = `Ln ${line}, Col ${col}`;
+    document.getElementById('nano-chars').textContent = `${ed.value.length} chars`;
+  }
+  async nanoSave(){
+    const ed = document.getElementById('nano-editor');
+    const fname = document.getElementById('nano-filename').textContent || 'untitled.txt';
+    const content = ed.value;
+    // FIXED: pakai httpConnected (REST API), bukan connected (WS)
+    if (this.httpConnected){
+      try {
+        const baseUrl = this.getHttpBase();
+        const resp = await fetch(baseUrl + '/api/nano/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-API-Token': this.apiToken },
+          body: JSON.stringify({ filename: fname, content })
+        });
+        if (resp.ok){
+          document.getElementById('nano-save-status').textContent = '✓ Tersimpan: ' + fname;
+          this.toast('File disimpan ke bridge', 'success');
+          return;
+        }
+      } catch(_){}
+    }
+    this.nanoDownload();
+    document.getElementById('nano-save-status').textContent = '✓ Downloaded: ' + fname;
+  }
+  async nanoSaveAs(){
+    const name = await this.prompt('Simpan Sebagai', 'Nama file:', document.getElementById('nano-filename').textContent, 'file.txt');
+    if (!name) return;
+    document.getElementById('nano-filename').textContent = name;
+    await this.nanoSave();
+  }
+  nanoDownload(){
+    const ed = document.getElementById('nano-editor');
+    const fname = document.getElementById('nano-filename').textContent || 'untitled.txt';
+    const blob = new Blob([ed.value], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fname;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  nanoOpenFile(){
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.txt,.sh,.py,.js,.html,.css,.md,.json,.xml,.yml,.yaml,*/*';
+    inp.onchange = () => {
+      const file = inp.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('nano-editor').value = e.target.result;
+        document.getElementById('nano-filename').textContent = file.name;
+        this.nanoUpdateNumbers();
+      };
+      reader.readAsText(file);
+    };
+    inp.click();
+  }
+  async nanoClear(){
+    const ok = await this.confirm('Clear Buffer', 'Hapus semua isi editor?', { danger: true, okText: 'Hapus' });
+    if (!ok) return;
+    document.getElementById('nano-editor').value = '';
+    this.nanoUpdateNumbers();
+  }
+
+  /* ---------- WEB RUNNER ---------- */
+  setupWebRunner(){
+    const drop = document.getElementById('webrun-drop');
+    const fileInput = document.getElementById('webrun-file-input');
+    if (!drop || !fileInput) return;
+    drop.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => {
+      this.addWebrunFiles(Array.from(e.target.files || []));
+      fileInput.value = '';
+    });
+    ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault(); drop.classList.add('dragover');
+    }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault(); drop.classList.remove('dragover');
+    }));
+    drop.addEventListener('drop', e => {
+      const files = Array.from(e.dataTransfer.files || []);
+      this.addWebrunFiles(files);
+    });
+    document.querySelectorAll('.webrun-tabs button').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.webrun-tabs button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        const tab = b.getAttribute('data-wrtab');
+        document.querySelectorAll('.webrun-panel').forEach(p => p.classList.toggle('active', p.getAttribute('data-panel') === tab));
+      });
+    });
+  }
+  addWebrunFiles(files){
+    this._webrunFiles.push(...files);
+    this.renderWebrunFiles();
+  }
+  renderWebrunFiles(){
+    const list = document.getElementById('webrun-file-list');
+    list.innerHTML = '';
+    this._webrunFiles.forEach((f, i) => {
+      const size = f.size < 1024 ? f.size + ' B' :
+        f.size < 1024*1024 ? (f.size/1024).toFixed(1) + ' KB' :
+        (f.size/1024/1024).toFixed(1) + ' MB';
+      const el = document.createElement('div');
+      el.className = 'wr-file';
+      el.innerHTML = `<span class="wr-name">${this.esc(f.name)}</span><span class="wr-size">${size}</span><button class="wr-rm" data-i="${i}">✕</button>`;
+      el.querySelector('.wr-rm').onclick = (e) => {
+        e.stopPropagation();
+        this._webrunFiles.splice(i, 1);
+        this.renderWebrunFiles();
+      };
+      list.appendChild(el);
+    });
+  }
+
+  /* ============================================================
+     WEB RUNNER START — FIXED
+     - Health-check dulu (jangan rely pada this.connected)
+     - Auto-rewrite localhost → hostname untuk LAN access
+     - Log token + URL untuk debugging
+     ============================================================ */
+  async webrunStart(){
+    if (this._webrunFiles.length === 0){
+      this.toast('Upload minimal 1 file', 'warning');
+      return;
+    }
+    const btn = document.getElementById('webrun-start-btn');
+    btn.disabled = true; btn.textContent = 'Starting...';
+
+    // Switch to console
+    document.querySelectorAll('.webrun-tabs button').forEach(x => x.classList.remove('active'));
+    document.querySelector('[data-wrtab="console"]').classList.add('active');
+    document.querySelectorAll('.webrun-panel').forEach(p =>
+      p.classList.toggle('active', p.getAttribute('data-panel') === 'console'));
+
+    const consoleEl = document.getElementById('webrun-console');
+    consoleEl.innerHTML = '';
+    const log = (msg, cls='') => {
+      const span = document.createElement('div');
+      span.className = 'log-line';
+      span.innerHTML = cls ? `<span class="${cls}">${this.esc(msg)}</span>` : this.esc(msg);
+      consoleEl.appendChild(span);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    };
+
+    log('$ Memulai web runner...', 'log-info');
+    log(`  Files: ${this._webrunFiles.map(f => f.name).join(', ')}`, 'log-dim');
+
+    // ─── Single HTML → blob preview (tanpa bridge) ───
+    if (this._webrunFiles.length === 1 && /\.(html?|htm)$/i.test(this._webrunFiles[0].name)){
+      const f = this._webrunFiles[0];
+      const text = await f.text();
+      const blob = new Blob([text], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      this._webrunPreviewUrl = url;
+      log('✓ Single HTML — preview via blob URL', 'log-ok');
+      log('  (multi-file / ZIP butuh bridge)', 'log-warn');
+      this.setWebrunStatus(true, 'ready (blob)', 'blob');
+      this._showWebrunPreview(url, 'http://blob-preview.local/');
+      btn.disabled = false; btn.textContent = '▶ Start Server';
+      return;
+    }
+
+    // ─── Multi-file / ZIP → butuh bridge ───
+    const httpBase = this.getHttpBase();
+    const tokenShort = this.apiToken ? (this.apiToken.slice(0, 14) + '...') : '(kosong)';
+
+    // Step 1: Health check
+    log('$ Cek koneksi ke bridge...', 'log-info');
+    log(`  URL   : ${httpBase}`, 'log-dim');
+    log(`  Token : ${tokenShort}`, 'log-dim');
+
+    let bridgeOk = false;
+    try {
+      const checkUrl = httpBase + '/check?token=' + encodeURIComponent(this.apiToken);
+      const opts = { headers: { 'X-API-Token': this.apiToken } };
+      if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+        opts.signal = AbortSignal.timeout(8000);
+      }
+      const check = await fetch(checkUrl, opts);
+      if (check.ok){
+        const d = await check.json();
+        log(`✓ Bridge v${d.version} online (${d.execMode})`, 'log-ok');
+        bridgeOk = true;
+        this.httpConnected = true;
+        this.bridgeVersion = d.version;
+      } else if (check.status === 401){
+        log(`✗ HTTP 401 — token salah`, 'log-err');
+        log(`  Token saat ini: ${tokenShort}`, 'log-dim');
+        log(`  Cek: bridge.js (.token) atau Settings`, 'log-warn');
+      } else {
+        log(`✗ HTTP ${check.status}`, 'log-err');
+      }
+    } catch(e){
+      log(`✗ Bridge tidak terjangkau: ${e.message}`, 'log-err');
+    }
+
+    if (!bridgeOk){
+      log('', '');
+      log('🔧 Troubleshooting:', 'log-warn');
+      log('  1. Pastikan bridge.js sudah jalan:', 'log-dim');
+      log('     node bridge.js', 'log-dim');
+      log('  2. Cek API token di Settings:', 'log-dim');
+      log('     ' + tokenShort, 'log-dim');
+      log('  3. Test di browser:', 'log-dim');
+      log('     ' + httpBase + '/check?token=...', 'log-dim');
+      log('  4. Kalau akses dari HP lain, pastikan:', 'log-dim');
+      log('     Settings → URL: ws://<IP-PC>:7700', 'log-dim');
+      this.setWebrunStatus(false, 'offline', '—');
+      btn.disabled = false; btn.textContent = '▶ Start Server';
+      return;
+    }
+
+    // Step 2: Upload
+    try {
+      const fd = new FormData();
+      this._webrunFiles.forEach(f => fd.append('files', f, f.name));
+      const totalSize = this._webrunFiles.reduce((a,f) => a + f.size, 0);
+      log('$ Uploading files...', 'log-info');
+      log(`  ${this._webrunFiles.length} file, ${(totalSize/1024).toFixed(1)} KB`, 'log-dim');
+
+      const opts = {
+        method: 'POST',
+        headers: { 'X-API-Token': this.apiToken },
+        body: fd
+      };
+      if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+        opts.signal = AbortSignal.timeout(120000);
+      }
+      const resp = await fetch(httpBase + '/api/webrun/start', opts);
+
+      if (!resp.ok){
+        const errText = await resp.text().catch(() => '');
+        throw new Error(`HTTP ${resp.status} ${errText.slice(0, 200)}`);
+      }
+      const data = await resp.json();
+      if (!data.ok) throw new Error(data.error || 'unknown error');
+
+      this._webrunRunId = data.runId;
+      this._webrunPort = data.port;
+
+      // 🔑 Rewrite localhost → hostname (biar bisa diakses dari device lain)
+      let previewUrl = data.url;
+      const hostname = window.location.hostname;
+      if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1' && previewUrl){
+        previewUrl = previewUrl.replace(
+          /\/\/(localhost|127\.0\.0\.1)(:)/,
+          '//' + hostname + '$2'
+        );
+      }
+
+      log(`✓ Server siap di port ${data.port}`, 'log-ok');
+      log(`  Entry: ${data.entry}`, 'log-info');
+      log(`  URL  : ${previewUrl}`, 'log-info');
+      if (Array.isArray(data.logs)){
+        data.logs.forEach(l => log('  ' + l, 'log-dim'));
+      }
+
+      this.setWebrunStatus(true, 'running', data.port);
+      this._showWebrunPreview(previewUrl, previewUrl);
+      this._subscribeWebrunLogs(httpBase, data.runId, log);
+
+    } catch(e){
+      log('✗ Upload gagal: ' + e.message, 'log-err');
+      log('', '');
+      log('Kemungkinan penyebab:', 'log-warn');
+      log('  - File terlalu besar (max 200MB/file)', 'log-dim');
+      log('  - Bridge versi lama (tidak support /api/webrun/start)', 'log-dim');
+      log('  - ZIP corrupt / gagal extract', 'log-dim');
+      log('  - Token tidak valid (401)', 'log-dim');
+      this.setWebrunStatus(false, 'error', '—');
+    }
+    btn.disabled = false; btn.textContent = '▶ Start Server';
+  }
+
+  _showWebrunPreview(url, label){
+    document.getElementById('webrun-url').value = label || url;
+    document.getElementById('webrun-iframe').src = url;
+    setTimeout(() => {
+      document.querySelectorAll('.webrun-tabs button').forEach(x => x.classList.remove('active'));
+      document.querySelector('[data-wrtab="preview"]').classList.add('active');
+      document.querySelectorAll('.webrun-panel').forEach(p => p.classList.toggle('active', p.getAttribute('data-panel') === 'preview'));
+    }, 400);
+  }
+  _subscribeWebrunLogs(httpBase, runId, log){
+    if (this._webrunEventSource) { try { this._webrunEventSource.close(); } catch(_){} }
+    try {
+      const url = httpBase + '/api/webrun/logs/' + encodeURIComponent(runId) + '?token=' + encodeURIComponent(this.apiToken);
+      const es = new EventSource(url);
+      this._webrunEventSource = es;
+      es.onmessage = ev => {
+        try {
+          const d = JSON.parse(ev.data);
+          if (d.log) log(d.log, d.level || '');
+        } catch(_){}
+      };
+      es.onerror = () => { try { es.close(); } catch(_){} };
+    } catch(_){}
+  }
+  setWebrunStatus(online, text, port){
+    const dot = document.getElementById('webrun-dot');
+    const st = document.getElementById('webrun-status-text');
+    const pl = document.getElementById('webrun-port-label');
+    if (dot) dot.classList.toggle('on', online);
+    if (st) st.textContent = text;
+    if (pl) pl.textContent = 'port: ' + (port || '—');
+  }
+  async webrunStop(){
+    if (!this._webrunRunId){ this.toast('Tidak ada server berjalan', 'warning'); return; }
+    const ok = await this.confirm('Stop Server', 'Hentikan server web yang sedang berjalan?', { danger: true, okText: 'Stop' });
+    if (!ok) return;
+    try {
+      const httpBase = this.getHttpBase();
+      await fetch(httpBase + '/api/webrun/stop/' + this._webrunRunId, {
+        method: 'POST',
+        headers: { 'X-API-Token': this.apiToken }
+      });
+    } catch(_){}
+    if (this._webrunEventSource){ try { this._webrunEventSource.close(); } catch(_){} this._webrunEventSource = null; }
+    this._webrunRunId = null;
+    this._webrunPort = null;
+    document.getElementById('webrun-iframe').src = 'about:blank';
+    this.setWebrunStatus(false, 'stopped', '—');
+    this.toast('Server dihentikan', 'success');
+  }
+  webrunOpenExternal(){
+    const url = document.getElementById('webrun-url').value;
+    if (url && url.startsWith('http')) window.open(url, '_blank');
+    else this.toast('Belum ada URL', 'warning');
+  }
+  webrunRefresh(){
+    const iframe = document.getElementById('webrun-iframe');
+    if (iframe && iframe.src){ iframe.src = iframe.src; this.toast('Refresh', 'success'); }
+  }
+  openWebRunner(){ this.closeSidebar(); this.showView('webrun-view'); }
+
+  /* ---------- WEB2APP ---------- */
+  openWeb2App(){ this.closeSidebar(); this.showView('web2app-view'); }
+  setSplashMode(mode){
+    document.querySelectorAll('#web2app-view .tabs button').forEach((b,i) => b.classList.toggle('active', (mode==='image' && i===0) || (mode==='video' && i===1)));
+    document.getElementById('splash-image').classList.toggle('active', mode==='image');
+    document.getElementById('splash-video').classList.toggle('active', mode==='video');
+    this._splashMode = mode;
+  }
+  onZipSelected(input){ document.getElementById('w2a-zip-name').textContent = input.files[0]?.name || ''; }
+  onVideoSelected(input){ document.getElementById('w2a-video-name').textContent = input.files[0]?.name || ''; }
+  onLogoSelected(input){
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('w2a-logo-preview').innerHTML = `<img src="${e.target.result}" alt="logo">`;
+      this._logoDataUrl = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  getWeb2AppConfig(){
+    return {
+      url: document.getElementById('w2a-url').value.trim(),
+      zip: document.getElementById('w2a-zip').files[0] || null,
+      name: document.getElementById('w2a-name').value.trim() || 'My App',
+      package: document.getElementById('w2a-package').value.trim() || 'com.tyn.app',
+      version: document.getElementById('w2a-version').value.trim() || '1.0.0',
+      logoDataUrl: this._logoDataUrl || null,
+      splashMode: this._splashMode || 'image',
+      splashBg: document.getElementById('w2a-splash-bg').value,
+      splashText: document.getElementById('w2a-splash-text').value,
+      splashSkip: document.getElementById('w2a-splash-skip').checked,
+      splashSkipVideo: document.getElementById('w2a-splash-skip-v').checked,
+      video: document.getElementById('w2a-video').files[0] || null,
+      urlHandling: document.querySelector('input[name="w2a-urlhandling"]:checked').value,
+      sidebar: document.getElementById('w2a-sidebar').checked,
+      slider: document.getElementById('w2a-slider').checked,
+      fullscreen: document.getElementById('w2a-fullscreen').checked,
+      permissions: {
+        internet: document.getElementById('perm-internet').checked,
+        write: document.getElementById('perm-write').checked,
+        read: document.getElementById('perm-read').checked,
+        camera: document.getElementById('perm-camera').checked,
+        location: document.getElementById('perm-location').checked,
+        audio: document.getElementById('perm-audio').checked,
+        notification: document.getElementById('perm-notification').checked
+      }
+    };
+  }
+  previewApp(){
+    const cfg = this.getWeb2AppConfig();
+    this.toast('Preview: ' + cfg.name + ' (' + cfg.package + ')');
+  }
+  async buildApp(){
+    const cfg = this.getWeb2AppConfig();
+    if (!cfg.url && !cfg.zip){ this.toast('Isi URL atau ZIP', 'error'); return; }
+    // FIXED: pakai httpConnected (REST), bukan connected (WS)
+    if (!this.httpConnected){
+      this.toast('Bridge offline — cek Settings dulu', 'error');
+      this.testConnection();
+      return;
+    }
+    const btn = document.getElementById('w2a-build-btn');
+    btn.disabled = true; btn.textContent = 'Building...';
+    try {
+      const fd = new FormData();
+      fd.append('config', JSON.stringify(cfg));
+      if (cfg.zip) fd.append('zip', cfg.zip);
+      if (cfg.video) fd.append('video', cfg.video);
+      const baseUrl = this.getHttpBase();
+      const resp = await fetch(baseUrl + '/api/build', {
+        method: 'POST',
+        headers: { 'X-API-Token': this.apiToken },
+        body: fd
+      });
+      const data = await resp.json();
+      if (data.ok){
+        this.releases.unshift(data.app);
+        localStorage.setItem('tyn_releases', JSON.stringify(this.releases));
+        this.toast('Build sukses!', 'success');
+        this.openReleases();
+      } else { this.toast('Build gagal: ' + (data.error || 'unknown'), 'error'); }
+    } catch(e){ this.toast('Error: ' + e.message, 'error'); }
+    btn.disabled = false; btn.textContent = 'Build APK';
+  }
+
+  /* ---------- RELEASES ---------- */
+  openReleases(){ this.closeSidebar(); this.showView('releases-view'); this.loadReleases(); }
+  loadReleases(){
+    const c = document.getElementById('releases-content');
+    if (!this.releases.length){
+      c.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg><h3>Belum ada APK</h3><p>Build aplikasi di Web2App Builder</p></div>';
+      return;
+    }
+    c.innerHTML = '';
+    this.releases.forEach(rel => {
+      const card = document.createElement('div');
+      card.className = 'release-card';
+      card.innerHTML = `
+        <div class="release-icon">${rel.logoDataUrl ? `<img src="${rel.logoDataUrl}">` : '<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>'}</div>
+        <div class="release-info">
+          <div class="name">${this.esc(rel.name)}</div>
+          <div class="pkg">${this.esc(rel.package)} · v${this.esc(rel.version)}</div>
+          <div class="meta"><span>📦 ${((rel.size||0)/1024).toFixed(1)} KB</span><span>🕐 ${new Date(rel.createdAt).toLocaleDateString()}</span></div>
+          <div class="actions"><button class="dl" data-id="${rel.id}">Download</button><button class="del" data-id="${rel.id}">Hapus</button></div>
+        </div>`;
+      card.querySelector('.dl').onclick = () => this.downloadRelease(rel.id);
+      card.querySelector('.del').onclick = () => this.deleteRelease(rel.id);
+      c.appendChild(card);
+    });
+  }
+  downloadRelease(id){
+    const baseUrl = this.getHttpBase();
+    window.open(`${baseUrl}/api/download/${id}?token=${encodeURIComponent(this.apiToken)}`, '_blank');
+  }
+  async deleteRelease(id){
+    const ok = await this.confirm('Hapus Release', 'Hapus release ini?', { danger: true, okText: 'Hapus' });
+    if (!ok) return;
+    this.releases = this.releases.filter(r => r.id !== id);
+    localStorage.setItem('tyn_releases', JSON.stringify(this.releases));
+    this.loadReleases();
+  }
+
+  openSettings(){ this.closeSidebar(); this.showView('settings-view'); this.loadSettingsToForm(); }
+
+  save(){ localStorage.setItem('tyn_servers', JSON.stringify(this.servers)); }
+  getServer(id){ return this.servers.find(s => s.id === id); }
+  esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+}
+
+const app = new TYN();
+</script>
+</body>
+</html>
